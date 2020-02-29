@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'screens/main_navigation/main_navigation.dart';
+import 'package:grad_project/providers/auth_provider.dart';
+import 'screens/landing.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-
-      home: MainNavigationPage(),
-
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<Authenticator>(
+          create: (context) => Authenticator(),
+        ),
+      ],
+      child: MaterialApp(
+        home: Landing(),
+      ),
     );
   }
 }
