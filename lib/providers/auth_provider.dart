@@ -30,21 +30,37 @@ class Authenticator extends ChangeNotifier {
       print('No saved data found');
       _status = Status.Unauthenticated;
     } else {
-      print('Logging in with saved credentials');
-      _logIn(email.trim(), pass);
-      _status = Status.Authenticated;
+      try {
+        print(1);
+        print('Logging in with saved credentials');
+        print(2);
+        await _logIn(email.trim(), pass);
+        print(3);
+        _status = Status.Authenticated;
+        print(4);
+      } catch (e) {
+        print(5);
+        print('An error occured while loggin with saved credentials');
+        print(6);
+        _status = Status.Unauthenticated;
+        print(7);
+      }
     }
     notifyListeners();
   }
 
   logIn(String email, String pass, bool savePass) async {
     try {
+      print('x');
       await _logIn(email.trim(), pass);
+      print('y');
       if (savePass) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', email.trim());
         await prefs.setString('password', pass);
       }
+      print('z');
+
       _status = Status.Authenticated;
       notifyListeners();
     } catch (e) {
@@ -71,15 +87,16 @@ class Authenticator extends ChangeNotifier {
         followingCount: 0,
         followerCount: 0,
         postCount: 0,
-        profilePictureUrl: '',
+        profilePictureUrl: 'https://bit.ly/2TjKBO1',
       );
       await _firestore
           .collection('users')
           .document(signUpResult.user.uid)
           .setData(user.toJson());
 
-      _status = Status.Authenticated;
-      notifyListeners();
+      //_status = Status.Authenticated;
+      //notifyListeners();
+      await _firebaseAuth.signOut();
       return "Signed up successfully";
     } catch (e) {
       return e.message;
@@ -87,10 +104,14 @@ class Authenticator extends ChangeNotifier {
   }
 
   _logIn(String email, String pass) async {
+    print('a');
+
     await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: pass,
     );
+
+    print('b');
     _user = await _firebaseAuth.currentUser();
   }
 }

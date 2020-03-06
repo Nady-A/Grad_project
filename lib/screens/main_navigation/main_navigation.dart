@@ -21,7 +21,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         children: <Widget>[
           Featured(),
           Home(),
-          Add(),
+          //Add(),
+          Container(),
           Events(),
           MyProfile(),
         ],
@@ -33,9 +34,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,
         onTap: (i){
-          setState(() {
-            _currentIndex = i;
-          });
+
+          if(i == 2){
+            Navigator.pushNamed(context, '/add_post');
+          }else{
+            setState(() {
+              _currentIndex = i;
+            });
+          }
         },
 
         items: [
