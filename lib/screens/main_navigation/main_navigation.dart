@@ -47,11 +47,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            title: Text('Explore'),
+            title: Text('Discover'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('Featured'),
+            title: Text('Home'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
