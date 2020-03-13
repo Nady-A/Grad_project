@@ -11,7 +11,7 @@ class Landing extends StatelessWidget {
   Widget build(BuildContext context) {
 
     var authProvider = Provider.of<Authenticator>(context);
-    print('REDRAWING LANDING PAGE');
+    //print('REDRAWING LANDING PAGE');
     return Builder(
       builder: (context){
         switch(authProvider.getStatus) {

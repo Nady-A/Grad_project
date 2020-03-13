@@ -30,6 +30,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       ),
 
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,

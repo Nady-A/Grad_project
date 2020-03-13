@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'providers/auth_provider.dart';
 import 'providers/upload_provider.dart';
+import 'providers/post_provider.dart';
 import 'package:grad_project/screens/landing.dart';
 import 'package:grad_project/screens/add/add.dart';
+import 'package:grad_project/screens/post/post.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
@@ -18,10 +20,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<Uploader>(
           create: (context) => Uploader(),
         ),
+        ChangeNotifierProvider<PostProvider>(
+          create: (context) => PostProvider(),
+        )
       ],
       child: MaterialApp(
         home: Landing(),
-        routes: {'/add_post': (context) => Add()},
+        routes: {
+          '/add_post': (context) => Add(),
+        },
       ),
     );
   }

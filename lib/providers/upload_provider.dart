@@ -49,17 +49,17 @@ class Uploader extends ChangeNotifier {
     List<String> uploadUrls = [];
     List<String> userIds = [];
     try {
-
-
-      for (File f in files){
+      for (File f in files) {
         print(1);
-        storageReference = FirebaseStorage.instance.ref().child('/files').child(DateTime.now().millisecondsSinceEpoch.toString() + basename(f.path));
+        storageReference = FirebaseStorage.instance.ref().child('/files').child(
+            DateTime.now().millisecondsSinceEpoch.toString() +
+                basename(f.path));
         storageUploadTask = storageReference.putFile(f);
         print(2);
-        var url = await( await storageUploadTask.onComplete).ref.getDownloadURL();
+        var url =
+            await (await storageUploadTask.onComplete).ref.getDownloadURL();
         print(3);
         uploadUrls.add(url.toString());
-
       }
 
       print(4);
@@ -70,21 +70,23 @@ class Uploader extends ChangeNotifier {
       coAuthorData.forEach((u) => userIds.add(u[1]));
 
       Post p = Post(
-          createdAt: DateTime.now().millisecondsSinceEpoch,
-          likes: 0,
-          url: uploadUrls,
-          title: postTitle,
-          description: postDescription,
-          category: category,
-          userId: userIds);
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        likes: 0,
+        views: 0,
+        url: uploadUrls,
+        tags: tags,
+        title: postTitle,
+        description: postDescription,
+        category: category,
+        userId: userIds,
+      );
 
       await _db.collection('posts').add(p.toJson());
 
       return 'Upload successful';
     } catch (e) {
-      print(e.message);
+      print(e);
       return 'error occured';
-      return e.message;
     }
   }
 }
