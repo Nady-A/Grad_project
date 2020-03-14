@@ -38,13 +38,13 @@ class Profile extends StatelessWidget {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            backgroundColor: Colors.white,
-            /*shape: RoundedRectangleBorder(
+            backgroundColor: Colors.grey[200],
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(25),
                 bottomRight: Radius.circular(25)
               ),
-            ),*/
+            ),
             title: Text('My Profile'),
             floating: true,
             expandedHeight: x.height / 1.92,

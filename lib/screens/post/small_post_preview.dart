@@ -21,6 +21,15 @@ class SmallPostPreview extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: Colors.grey.shade300,
+          image: DecorationImage(image: AssetImage('assets/loading.gif'))
+        ),
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.grey.shade300,
+          image: DecorationImage(
+            image: NetworkImage(previewUrl),
+            fit: BoxFit.cover,
+          ),
         ),
         margin: EdgeInsets.only(right: 25),
         width: w / 2,
@@ -28,14 +37,15 @@ class SmallPostPreview extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: FadeInImage.assetNetwork(
-                placeholder: 'assets/loading.gif',
-                image: previewUrl,
-                //fit: BoxFit.fill,
-              ),
-            )
+            //Image.network(previewUrl)
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(15),
+            //   child: FadeInImage.assetNetwork(
+            //     placeholder: 'assets/loading.gif',
+            //     image: previewUrl,
+            //     fit: BoxFit.cover,
+            //   ),
+            // )
           ],
         ),
       ),

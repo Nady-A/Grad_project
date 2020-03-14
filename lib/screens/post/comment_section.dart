@@ -24,6 +24,13 @@ class _CommentSectionState extends State<CommentSection> {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILDING COMMENT SECTION');
+    print(commentsAreLoaded);
+    print(comments);
+    print(widget.myId);
+    print(widget.postId);
+    print(widget.myProfilePic);
+    print(widget.myUserName);
     return Container(
       margin: EdgeInsets.only(top: 15, left: 15),
       child: commentsAreLoaded
@@ -105,10 +112,10 @@ class _CommentSectionState extends State<CommentSection> {
   }
 
   Widget _buildComment(Comment c) {
-    return ListTile(
+   return ListTile(
       leading: ProfilePictureAvatar(
-        picUrl: widget.myProfilePic,
-        userId: widget.myId,
+        picUrl: c.profilePic,
+        userId: c.userId,
       ),
       title: Text(c.userName),
       subtitle: Text(c.commentText),
@@ -123,7 +130,7 @@ class _CommentSectionState extends State<CommentSection> {
                 });
               },
             )
-          : Container(),
+          : Container(width: 0, height: 0,),
     );
   }
 }
