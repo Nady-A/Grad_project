@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "579675292327",
+    "firebase_url": "https://talentapp-dc5b9.firebaseio.com",
+    "project_id": "talentapp-dc5b9",
+    "storage_bucket": "talentapp-dc5b9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:579675292327:android:ac5071045015f1f28f9182",
+        "android_client_info": {
+          "package_name": "com.hhh.grad_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "579675292327-m6ruef1vvmf8ra2lgjdrp145ogbv2h2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB76u7IDijxMwbVMlg8uuy69o7sYm_eNaI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "579675292327-m6ruef1vvmf8ra2lgjdrp145ogbv2h2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

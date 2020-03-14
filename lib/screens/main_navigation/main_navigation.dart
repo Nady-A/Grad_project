@@ -21,7 +21,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         children: <Widget>[
           Featured(),
           Home(),
-          Add(),
+          //Add(),
+          Container(),
           Events(),
           MyProfile(),
         ],
@@ -29,23 +30,29 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       ),
 
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,
         onTap: (i){
-          setState(() {
-            _currentIndex = i;
-          });
+
+          if(i == 2){
+            Navigator.pushNamed(context, '/add_post');
+          }else{
+            setState(() {
+              _currentIndex = i;
+            });
+          }
         },
 
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            title: Text('Explore'),
+            title: Text('Discover'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('Featured'),
+            title: Text('Home'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
