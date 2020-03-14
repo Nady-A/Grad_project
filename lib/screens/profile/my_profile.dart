@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:grad_project/screens/post/post.dart';
 
 FirebaseUser currentUser;
 Firestore fs = Firestore.instance;
@@ -37,13 +38,13 @@ class Profile extends StatelessWidget {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            backgroundColor: Colors.white,
-            /*shape: RoundedRectangleBorder(
+            backgroundColor: Colors.grey[200],
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(25),
                 bottomRight: Radius.circular(25)
               ),
-            ),*/
+            ),
             title: Text('My Profile'),
             floating: true,
             expandedHeight: x.height / 1.92,
@@ -246,18 +247,7 @@ class Post extends StatelessWidget {
   Size x = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: (){
-          return showDialog(
-            context: context,
-            builder: (context){
-              return AlertDialog(
-                title: Text('TODO: POST PAGE'),
-                content: Text('go to post with id: ${post.documentID}'),
-                actions: <Widget>[
-                  FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                ],
-              );
-            }
-          );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => PostScreen(post.documentID)));
       },
       child: Padding(
         padding: EdgeInsets.all(8.0),

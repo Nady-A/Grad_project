@@ -39,7 +39,7 @@ class AppTextStyles {
   );
 
   static TextStyle postScreenDescription = TextStyle(
-    fontSize: 14,
+    fontSize: 18,
   );
 
   static TextStyle postScreenSectionTitle = TextStyle(
