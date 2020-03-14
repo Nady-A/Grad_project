@@ -25,54 +25,54 @@ class _PostHeaderState extends State<PostHeader> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(15),
-      child: Row(
-        children: <Widget>[
-          ProfilePictureAvatar(
-            picUrl: widget.creatorsData[0][2],
-            userId: widget.creatorsData[0][1],
-            avatarSize: 24,
-          ),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(left: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    widget.title,
-                    style: AppTextStyles.postScreenPostTitle,
-                    overflow: TextOverflow.fade,
-                  ),
-                  multipleUsers ? _multipleUserNames() : _oneUserName(),
-                ],
+        margin: EdgeInsets.all(15),
+        child: Row(
+          children: <Widget>[
+            ProfilePictureAvatar(
+              picUrl: widget.creatorsData[0][2],
+              userId: widget.creatorsData[0][1],
+              avatarSize: 24,
+            ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(left: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      widget.title,
+                      style: AppTextStyles.postScreenPostTitle,
+                      overflow: TextOverflow.fade,
+                    ),
+                    multipleUsers ? _multipleUserNames() : _oneUserName(),
+                  ],
+                ),
               ),
             ),
-          ),
-          !multipleUsers && widget.creatorsData[0][1] == widget.myId
-              ? Container()
-              : FlatButton(
-                  child: Text('Follow'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      side: BorderSide(color: Colors.blue)),
-                  onPressed: () async {
-                    if (!multipleUsers) {
-                      print('follow 1 user');
-                    } else {
-                      await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return FollowPopUp(widget.creatorsData,
-                              creatorsAreFollowed, widget.myId);
+            !multipleUsers && widget.creatorsData[0][1] == widget.myId
+                ? Container()
+                : multipleUsers
+                    ? FlatButton(
+                        child: Text('Follow'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          side: BorderSide(color: Colors.blue),
+                        ),
+                        onPressed: () async {
+                          await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return FollowPopUp(widget.creatorsData,
+                                  creatorsAreFollowed, widget.myId);
+                            },
+                          );
                         },
-                      );
-                    }
-                  },
-                )
-        ],
-      ),
-    );
+                      )
+                    : creatorsAreFollowed[0]
+                        ? _unFollowButton(widget.creatorsData[0][1], 0)
+                        : _followButton(widget.creatorsData[0][1], 0),
+          ],
+        ));
   }
 
   Widget _oneUserName() {
@@ -83,6 +83,38 @@ class _PostHeaderState extends State<PostHeader> {
     return Text(
       'by ${widget.creatorsData[0][0]} and ${widget.creatorsData.length - 1} collaborators',
       overflow: TextOverflow.fade,
+    );
+  }
+
+  Widget _followButton(String userId, int i) {
+    return FlatButton(
+      child: Text('Follow'),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+          side: BorderSide(color: Colors.blue)),
+      onPressed: () async {
+        await Provider.of<PostProvider>(context, listen: false)
+            .followUser(userId);
+        setState(() {
+          creatorsAreFollowed[i] = true;
+        });
+      },
+    );
+  }
+
+  Widget _unFollowButton(String userId, int i) {
+    return FlatButton(
+      child: Text('Unfollow'),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+          side: BorderSide(color: Colors.blue)),
+      onPressed: () async {
+        await Provider.of<PostProvider>(context).unFollowUser(userId);
+        setState(() {
+          creatorsAreFollowed[i] = false;
+        });
+        print('unfollow');
+      },
     );
   }
 
@@ -111,30 +143,36 @@ class _FollowPopUpState extends State<FollowPopUp> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: ListView(
-        shrinkWrap: true,
-        children: widget.creatorsData.asMap().entries.map((entry) {
-          var userIndex = entry.key;
-          var u = entry.value;
-          return Row(
-            children: <Widget>[
-              ProfilePictureAvatar(
-                picUrl: u[2],
-                userId: u[1],
-              ),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Text(u[0]),
-              )),
-              u[1] == widget.myId
-                  ? Container()
-                  : creatorsAreFollowed[userIndex]
-                      ? _unFollowButton(u[1], userIndex)
-                      : _followButton(u[1], userIndex),
-            ],
-          );
-        }).toList(),
+      content: Container(
+        width: 100,
+        height: 200,
+        child: SingleChildScrollView(
+          child: Column(
+            //shrinkWrap: true,
+            children: widget.creatorsData.asMap().entries.map((entry) {
+              var userIndex = entry.key;
+              var u = entry.value;
+              return Row(
+                children: <Widget>[
+                  ProfilePictureAvatar(
+                    picUrl: u[2],
+                    userId: u[1],
+                  ),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(u[0]),
+                  )),
+                  u[1] == widget.myId
+                      ? Container()
+                      : creatorsAreFollowed[userIndex]
+                          ? _unFollowButton(u[1], userIndex)
+                          : _followButton(u[1], userIndex),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }

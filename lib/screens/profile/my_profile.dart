@@ -45,9 +45,9 @@ class Profile extends StatelessWidget {
                 bottomRight: Radius.circular(25)
               ),
             ),
-            title: Text('My Profile'),
+            //title: Text('My Profile'),
             floating: true,
-            expandedHeight: x.height / 1.92,
+            expandedHeight: x.height / 1.7,
             flexibleSpace: FlexibleSpaceBar(
               background: ProfileHeader(),
             ),
@@ -81,7 +81,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             CoverProfilePic(x: x),
-            SizedBox(height: x.height / 13,),
+            SizedBox(height: x.height / 8,),
             UserInfo(x: x),
             SizedBox(height: x.height / 100,),
             Stats(x: x),
@@ -208,17 +208,17 @@ class CoverProfilePic extends StatelessWidget {
             height: x.height / 4.5,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://firebasestorage.googleapis.com/v0/b/talentapp-dc5b9.appspot.com/o/avatars%2Fcover.jpg?alt=media&token=f0f704c8-71b9-493c-a4cf-d6ef5da57396'),
+                image: NetworkImage(data['cover_picture_url']),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Positioned(
             top: x.height / 20,
-            left: x.width / 3.45,
+            left: x.width / 4,
             child: Container(
-              width: x.height / 4,
-              height: x.height / 4,
+              width: x.width / 2,
+              height: x.width / 2,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(data['profile_picture_url']),
@@ -255,8 +255,8 @@ class Post extends StatelessWidget {
           alignment: Alignment.center,
           children: <Widget>[
             Container(
-                width: 375,
-                height: 175,
+              margin: EdgeInsets.symmetric(horizontal: 10),
+                height: x.height / 4,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.grey,

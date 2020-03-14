@@ -87,7 +87,8 @@ class Authenticator extends ChangeNotifier {
         followingCount: 0,
         followerCount: 0,
         postCount: 0,
-        profilePictureUrl: 'https://bit.ly/2TjKBO1',
+        profilePictureUrl: 'https://firebasestorage.googleapis.com/v0/b/talentapp-dc5b9.appspot.com/o/avatars%2Fprofile%20stock.png?alt=media&token=eb14f30b-1bc5-4074-ad5d-2d9f7ae4536e',
+        coverPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/talentapp-dc5b9.appspot.com/o/avatars%2Fcover.jpg?alt=media&token=4bf040ac-3137-4312-a93f-08553746896c',
       );
       await _firestore
           .collection('users')

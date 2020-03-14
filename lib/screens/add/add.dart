@@ -460,6 +460,7 @@ class _CoAuthorsPopupState extends State<CoAuthorsPopup> {
         children: <Widget>[
           Expanded(
             child: TextField(
+              textAlign: TextAlign.center,
               onChanged: (val) {
                 searchKeyword = val;
               },
@@ -481,10 +482,14 @@ class _CoAuthorsPopupState extends State<CoAuthorsPopup> {
           ),
         ],
       ),
-      content: ListView(
-        children: searchResult.map((u) {
-          return _buildResultListItem(u);
-        }).toList(),
+      content: Container(
+        width: 500,
+        height: 300,
+        child: ListView(
+          children: searchResult.map((u) {
+            return _buildResultListItem(u);
+          }).toList(),
+        ),
       ),
       actions: <Widget>[
         FlatButton(

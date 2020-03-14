@@ -9,6 +9,7 @@ class User{
   String name;
   String bio;
   String profilePictureUrl;
+  String coverPictureUrl;
   int followingCount;
   int followerCount;
   int postCount;
@@ -18,6 +19,7 @@ class User{
     this.name,
     this.bio,
     this.profilePictureUrl,
+    this.coverPictureUrl,
     this.followingCount,
     this.followerCount,
     this.postCount,
@@ -29,6 +31,7 @@ class User{
     name: json["name"],
     bio: json["bio"],
     profilePictureUrl: json["profile_picture_url"],
+    coverPictureUrl: json['coverPictureUrl'],
     followingCount: json["following_count"],
     followerCount: json["follower_count"],
     postCount: json["post_count"],);
@@ -38,6 +41,7 @@ class User{
     "name": name,
     "bio": bio,
     "profile_picture_url": profilePictureUrl,
+    "cover_picture_url" : coverPictureUrl,
     "following_count": followingCount,
     "follower_count" : followerCount,
     "post_count": postCount,};

@@ -10,7 +10,7 @@ class PostTags extends StatelessWidget {
     //List<String> tags = Provider.of<PostProvider>(context).post.
     return Container(
       margin: EdgeInsets.only(left: 15 , bottom: 5 , top: 5),
-      child: tags.length > 1
+      child: tags.length > 0
           ? SingleChildScrollView(
               child: Row(
                 children: tags.map((t) => _buildTagItem(t)).toList(),

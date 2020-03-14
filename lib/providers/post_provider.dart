@@ -7,7 +7,7 @@ import 'package:grad_project/Classes/Comment.dart';
 class PostProvider extends ChangeNotifier {
   Firestore _db = Firestore.instance;
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  Post _post;
+  //Post _post;
 
   ///Getting post and all related information
   getPost(String postId) async {
@@ -15,95 +15,120 @@ class PostProvider extends ChangeNotifier {
     Post p;
     print(postId);
     await _incrementView(postId);
-    await _getPostBody(postId);
-    await _getCreatorsInfo();
-    await _getFollowStatus();
-    await _getLikeAndFavStatus(postId);
-    p = _post;
+    p = await _getPostBody(postId);
+    p.creatorsAvatarsAndIds = await _getCreatorsInfo(p.userId);
+    p.creatorsAreFollowed = await _getFollowStatus(p.userId);
+    //await _getLikeAndFavStatus(postId);
+    p.inLikes = await _getLikeStatus(postId);
+    p.inFavs = await _getFavStatus(postId);
+    //p = _post;
     return p;
   }
 
   _getPostBody(String postId) async {
+    Post post;
     await _db.collection('posts').document(postId).get().then((x) {
-      _post = Post.fromJson(x.data);
-      _post.postId = x.documentID;
+      post = Post.fromJson(x.data);
+      post.postId = x.documentID;
     });
+    return post;
   }
 
-  _getCreatorsInfo() async {
-    var userIds = _post.userId;
-
+  _getCreatorsInfo(List<String> userIds) async {
+    //var userIds = _post.userId;
+    List<List<String>> creatorsAvatarsAndIds = [];
     for (var id in userIds) {
       await _db.collection('users').document(id).get().then((x) {
-        _post.creatorsAvatarsAndIds
-            .add([x['name'], id, x['profile_picture_url']]);
+        creatorsAvatarsAndIds.add([x['name'], id, x['profile_picture_url']]);
       });
     }
+    return creatorsAvatarsAndIds;
   }
 
-  _getLikeAndFavStatus(String postId) async {
+  _getLikeStatus(String postId) async {
+    bool inLikes;
     var user = await _firebaseAuth.currentUser();
-
-    await _db
+    CollectionReference likesRef = _db.collection('users').document(user.uid).collection('likes');
+      //Add post to my likes collection
+    await likesRef.document(postId).get().then((result){
+      if(result.exists){
+        inLikes = true;
+      }else{
+        inLikes = false;
+      }
+    }
+    );
+    /*await _db
         .collection('users')
         .document(user.uid)
         .collection('likes')
         .where(
-      "post_id",
-      isEqualTo: postId,
-    )
+          "post_id",
+          isEqualTo: postId,
+        )
         .getDocuments()
         .then((x) {
       if (x.documents.isEmpty) {
-        _post.inLikes = false;
+        inLikes = false;
       } else {
-        _post.inLikes = true;
+        inLikes = true;
       }
-    });
-
-    await _db
-        .collection('users')
-        .document(user.uid)
-        .collection('favs')
-        .where(
-      "post_id",
-      isEqualTo: postId,
-    )
-        .getDocuments()
-        .then((x) {
-      if (x.documents.isEmpty) {
-        _post.inFavs = false;
-      } else {
-        _post.inFavs = true;
-      }
-    });
+    });*/
+    return inLikes;
   }
 
-  _getFollowStatus() async {
-    var userIds = _post.userId;
+  _getFavStatus(String postId) async {
+    bool inFavs;
+    var user = await _firebaseAuth.currentUser();
+    CollectionReference favRef =
+        _db.collection('users').document(user.uid).collection('favs');
+    await favRef.document(postId).get().then((result) {
+      if (result.exists) {
+        inFavs = true;
+      } else {
+        inFavs = false;
+      }
+    });
+
+    return inFavs;
+  }
+
+  _getFollowStatus(List<String> userIds) async {
+    //var userIds = _post.userId;
+    List<bool> creatorsAreFollowed = [];
     var myData = await _firebaseAuth.currentUser();
     var myId = myData.uid;
 
     for (var id in userIds) {
       if (id == myId) {
         print('CANNOT FOLLOW YOURSELF');
-        _post.creatorsAreFollowed.add(false);
+        creatorsAreFollowed.add(false);
         continue;
       }
-      await _db.collection('users').document(myId).collection('following').document(id).get().then((result) {
+      await _db
+          .collection('users')
+          .document(myId)
+          .collection('following')
+          .document(id)
+          .get()
+          .then((result) {
         if (result.exists) {
           print('USER $id IS FOLLOWED');
-          _post.creatorsAreFollowed.add(true);
+          creatorsAreFollowed.add(true);
         } else {
           print('USER $id IS NOT FOLLOWED');
-          _post.creatorsAreFollowed.add(false);
+          creatorsAreFollowed.add(false);
         }
       });
     }
+    return creatorsAreFollowed;
   }
 
   _incrementView(String postId) async {
-    await _db.collection('posts').document(postId).updateData({'views': FieldValue.increment(1)});
+    await _db
+        .collection('posts')
+        .document(postId)
+        .updateData({'views': FieldValue.increment(1)});
   }
 
   ///More work from creators
@@ -111,7 +136,12 @@ class PostProvider extends ChangeNotifier {
   getMoreFromCreator(List<String> ids, String postId) async {
     List<List<String>> posts = [];
     for (var id in ids) {
-      await _db.collection('posts').where('user_id', arrayContains: id).limit(3).getDocuments().then((result) {
+      await _db
+          .collection('posts')
+          .where('user_id', arrayContains: id)
+          .limit(3)
+          .getDocuments()
+          .then((result) {
         for (var doc in result.documents) {
           if (doc.documentID == postId) continue;
           posts.add([doc.documentID, doc.data['url'][0], doc.data['category']]);
@@ -170,7 +200,10 @@ class PostProvider extends ChangeNotifier {
   ///Timestamp is used for sorting on retrieval only
   addComment(String txt, String postId) async {
     var user = await _firebaseAuth.currentUser();
-    Comment c = Comment(commentText: txt, userId: user.uid, createdAt: DateTime.now().millisecondsSinceEpoch);
+    Comment c = Comment(
+        commentText: txt,
+        userId: user.uid,
+        createdAt: DateTime.now().millisecondsSinceEpoch);
 
     var addedCommentRef = await _db
         .collection('posts')
@@ -182,7 +215,12 @@ class PostProvider extends ChangeNotifier {
   }
 
   deleteComment(String postId, String commentId) async {
-    await _db.collection('posts').document(postId).collection('comments').document(commentId).delete();
+    await _db
+        .collection('posts')
+        .document(postId)
+        .collection('comments')
+        .document(commentId)
+        .delete();
   }
 
   ///Current user information
@@ -210,17 +248,18 @@ class PostProvider extends ChangeNotifier {
     return userName;
   }
 
-
   ///Likes
   Future<String> addToLikes(String postId) async {
     try {
       var user = await _firebaseAuth.currentUser();
+      CollectionReference likesRef = _db.collection('users').document(user.uid).collection('likes');
       //Add post to my likes collection
-      await _db
+      await likesRef.document(postId).setData({'place_holder' : 'place_holder'});
+      /*await _db
           .collection('users')
           .document(user.uid)
           .collection('likes')
-          .add({'post_id': postId});
+          .add({'post_id': postId});*/
       //Increment post likes by 1
       await _db
           .collection('posts')
@@ -236,7 +275,9 @@ class PostProvider extends ChangeNotifier {
     try {
       var user = await _firebaseAuth.currentUser();
       //Search for post id then delete document containing it
-      await _db
+      CollectionReference likesRef = _db.collection('users').document(user.uid).collection('likes');    
+      await likesRef.document(postId).delete();
+      /*await _db
           .collection('users')
           .document(user.uid)
           .collection('likes')
@@ -244,14 +285,16 @@ class PostProvider extends ChangeNotifier {
           .getDocuments()
           .then((x) {
         x.documents[0].reference.delete();
-      });
-      await _db.collection('posts').document(postId).updateData({"likes": FieldValue.increment(-1)});
+      });*/
+      await _db
+          .collection('posts')
+          .document(postId)
+          .updateData({"likes": FieldValue.increment(-1)});
       return 'Removed from likes';
     } catch (e) {
       return 'An error occured';
     }
   }
-
 
   ///Favourites
 
@@ -259,23 +302,27 @@ class PostProvider extends ChangeNotifier {
     try {
       var user = await _firebaseAuth.currentUser();
       //Add post to my favourites collection
-      await _db
+      CollectionReference favRef =
+          _db.collection('users').document(user.uid).collection('favs');
+      await favRef.document(postId).setData({'place_holder': 'place_holder'});
+      /*await _db
           .collection('users')
           .document(user.uid)
           .collection('favs')
-          .add({'post_id': postId});
+          .add({'post_id': postId});*/
       return 'Added to favourites';
     } catch (e) {
       return 'An error occured';
     }
   }
 
-
-
   Future<String> deleteFromFavs(String postId) async {
     try {
       var user = await _firebaseAuth.currentUser();
-      await _db
+      CollectionReference favRef =
+          _db.collection('users').document(user.uid).collection('favs');
+      await favRef.reference().document(postId).delete();
+      /*await _db
           .collection('users')
           .document(user.uid)
           .collection('favs')
@@ -283,7 +330,7 @@ class PostProvider extends ChangeNotifier {
           .getDocuments()
           .then((x) {
         x.documents[0].reference.delete();
-      });
+      });*/
       return 'Removed from favourites';
     } catch (e) {
       return 'An error occured';
@@ -349,5 +396,5 @@ class PostProvider extends ChangeNotifier {
     await userFollowerRef.document(myId).delete();
   }
 
-  Post get post => _post;
+  //Post get post => _post;
 }

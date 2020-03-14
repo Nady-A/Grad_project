@@ -6,12 +6,12 @@ class PostDescription extends StatelessWidget {
   PostDescription(this.description);
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return description.isNotEmpty ? Container(
       margin: EdgeInsets.only(left: 15),
       child: Text(
         description,
         style: AppTextStyles.postScreenDescription,
       ),
-    );
+    ): Container(width: 0, height: 0,);
   }
 }
