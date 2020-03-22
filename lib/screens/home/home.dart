@@ -17,30 +17,75 @@ getData() async {
 }
 
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  bool isSearching = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text(
-          'Home',
-          style: AppTextStyles.appBarTitle,
-        ),
+        title: !isSearching ?
+        Text(
+          "Home",
+          style: AppTextStyles.appBarTitle,)
+            :TextField(
+          decoration: InputDecoration(
+              icon: Icon(Icons.search),
+              hintText: "search"),),
         centerTitle: true,
+        leading:
+        IconButton(
+          icon: Icon(Icons.format_list_bulleted),
+          color: Colors.black,
+          onPressed: (){},
+        ),
+        actions: <Widget>[
+          isSearching?
+          IconButton(
+            icon: Icon(Icons.cancel),
+            color: Colors.black,
+            onPressed: (){
+              setState(() {
+                this.isSearching = !this.isSearching;
+              });
+            },
+          ):
+          IconButton(
+            icon: Icon(Icons.search),
+            color: Colors.black,
+            onPressed: (){
+              setState(() {
+                this.isSearching = !this.isSearching;
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.sort),
+            color: Colors.black,
+            onPressed: (){},
+          )
+        ],
       ),
 
-      body: Center(
-        child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: <Widget>[
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-              ],
-            ) ),
+      body: Container(
+        margin: EdgeInsets.all(15.0) ,
+        child: Center(
+          child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                children: <Widget>[
+                  Post(),
+                  Post(),
+                  Post(),
+                  Post(),
+                ],
+              ) ),
+        ),
       ),
 
 
@@ -75,13 +120,13 @@ class Post extends StatelessWidget {
           alignment: Alignment.center,
           children: <Widget>[
             Container(
-              width: 375,
-              height: 175,
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              height: x.height / 4,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.grey,
                 image: DecorationImage(
-                  image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
+                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -125,7 +170,7 @@ class Post extends StatelessWidget {
                   );
                 },
                 icon: Icon(
-                  Icons.thumb_up,
+                  Icons.favorite_border,
                   color: Colors.white,
                   size: 25,
                 ),

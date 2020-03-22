@@ -17,89 +17,200 @@ getData() async {
 }
 
 
-class Featured extends StatelessWidget {
+class Featured extends StatefulWidget {
+  @override
+  _FeaturedState createState() => _FeaturedState();
+}
+
+class _FeaturedState extends State<Featured> {
+  bool isSearching = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-            'Discover',
-          style: AppTextStyles.appBarTitle,
-        ),
-        centerTitle: true,
-      ),
-
-      body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.all(15.0) ,
-                child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: <Widget>[
-                        FlatButton(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(5.0),),
-                          padding: EdgeInsets.all(1.0),
-                          onPressed: () {},
-                          child: Image(
-                            image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
-                            //https://www.pngarts.com/files/3/Button-PNG-Picture.png
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        FlatButton(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(18.0),),
-                          padding: EdgeInsets.all(1.0),
-                          onPressed: () {},
-                          child: Image(
-                            image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        FlatButton(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(18.0),),
-                          padding: EdgeInsets.all(1.0),
-                          onPressed: () {},
-                          child: Image(
-                            image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        FlatButton(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(18.0),),
-                          padding: EdgeInsets.all(1.0),
-                          onPressed: () {},
-                          child: Image(
-                            image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ],
-                    )  ),
+    return DefaultTabController(
+        length: 6,
+        child: Scaffold(
+          appBar: AppBar(
+            title: !isSearching ?
+            Text(
+              "Discover",
+             style: AppTextStyles.appBarTitle,)
+                :TextField(
+              decoration: InputDecoration(
+                icon: Icon(Icons.search),
+                hintText: "search"),),
+            centerTitle: true,
+            leading:
+              IconButton(
+                icon: Icon(Icons.format_list_bulleted),
+                color: Colors.black,
+                onPressed: (){},
               ),
-              Text(
-                  "Best of Last Week",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
+            actions: <Widget>[
+              isSearching?
+              IconButton(
+                icon: Icon(Icons.cancel),
+                color: Colors.black,
+                onPressed: (){
+                  setState(() {
+                    this.isSearching = !this.isSearching;
+                  });
+                },
+              ):
+              IconButton(
+                icon: Icon(Icons.search),
+                color: Colors.black,
+                onPressed: (){
+                  setState(() {
+                    this.isSearching = !this.isSearching;
+                  });
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.sort),
+                color: Colors.black,
+                onPressed: (){},
+              )
+            ],
+            backgroundColor: Colors.white,
+            elevation: 0,
+            bottom: TabBar(
+                isScrollable: true,
+                unselectedLabelColor: Colors.grey,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+//                    gradient: LinearGradient(
+//                        colors: [Colors.blueAccent, Colors.purpleAccent]),
+                    borderRadius: BorderRadius.circular(50),
+                    color: Colors.blueAccent),
+                tabs: [
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Featured"),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Music"),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Photography"),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Graphic Design"),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Drawing"),
+                    ),
+                  ),
+                  Tab(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Crafts"),
+                    ),
+                  ),
+                ]),
+          ),
+          body: TabBarView(
+            children: <Widget>[
+              Center(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.all(15.0) ,
+                      child: Text("Best of Last Week",
+                        style: AppTextStyles.appBarTitle,
+                      ),
+                    ),
+                    Post(),
+                    Post(),
+                  ],
+                )
+              ),
+              Center(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0) ,
+                        child: Text("Music",
+                          style: AppTextStyles.appBarTitle,
+                        ),
+                      ),
+                      Post(),
+                      Post(),
+                    ],
+                  )
+               ),
+              Center(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0) ,
+                        child: Text("Photography",
+                          style: AppTextStyles.appBarTitle,
+                        ),
+                      ),
+                      Post(),
+                      Post(),
+                    ],
                   )
               ),
-              Post()
+              Center(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0) ,
+                        child: Text("Graphic Design",
+                          style: AppTextStyles.appBarTitle,
+                        ),
+                      ),
+                      Post(),
+                      Post(),
+                    ],
+                  )
+              ),
+              Center(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0) ,
+                        child: Text("Drawing",
+                          style: AppTextStyles.appBarTitle,
+                        ),
+                      ),
+                      Post(),
+                      Post(),
+                    ],
+                  )
+              ),
+              Center(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0) ,
+                        child: Text("Crafts",
+                          style: AppTextStyles.appBarTitle,
+                        ),
+                      ),
+                      Post(),
+                      Post(),
+                    ],
+                  )
+              ),
             ],
-          ) ),
-
-
+          ),
+        )
     );
   }
 }
@@ -131,13 +242,13 @@ class Post extends StatelessWidget {
           alignment: Alignment.center,
           children: <Widget>[
             Container(
-              width: 375,
-              height: 175,
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              height: x.height / 4,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.grey,
                 image: DecorationImage(
-                  image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
+                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -181,7 +292,7 @@ class Post extends StatelessWidget {
                   );
                 },
                 icon: Icon(
-                  Icons.thumb_up,
+                  Icons.favorite_border,
                   color: Colors.white,
                   size: 25,
                 ),
@@ -210,3 +321,25 @@ class CategoryButton extends StatelessWidget{
     ); //Scaffold
   }
 }
+
+
+
+
+
+
+
+
+
+//                        FlatButton(
+//                          shape: new RoundedRectangleBorder(
+//                            borderRadius: new BorderRadius.circular(18.0),),
+//                          padding: EdgeInsets.all(1.0),
+//                          onPressed: () {},
+//                          child: Image(
+//                            image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
+//                            fit: BoxFit.fill,
+//                          ),
+//                        ),
+//                      ],
+//                    )  ),
+//              ),
