@@ -31,6 +31,7 @@ class _PostHeaderState extends State<PostHeader> {
             ProfilePictureAvatar(
               picUrl: widget.creatorsData[0][2],
               userId: widget.creatorsData[0][1],
+              myId: widget.myId,
               avatarSize: 24,
             ),
             Expanded(
@@ -157,6 +158,7 @@ class _FollowPopUpState extends State<FollowPopUp> {
                   ProfilePictureAvatar(
                     picUrl: u[2],
                     userId: u[1],
+                    myId: widget.myId,
                   ),
                   Expanded(
                       child: Padding(

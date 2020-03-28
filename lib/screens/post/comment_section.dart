@@ -45,6 +45,7 @@ class _CommentSectionState extends State<CommentSection> {
                   leading: ProfilePictureAvatar(
                     picUrl: widget.myProfilePic,
                     userId: widget.myId,
+                    myId: widget.myId,
                   ),
                   title: TextField(
                     controller: commentController,
@@ -116,6 +117,7 @@ class _CommentSectionState extends State<CommentSection> {
       leading: ProfilePictureAvatar(
         picUrl: c.profilePic,
         userId: c.userId,
+        myId: widget.myId,
       ),
       title: Text(c.userName),
       subtitle: Text(c.commentText),

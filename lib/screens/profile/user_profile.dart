@@ -2,33 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/screens/profile/post_card.dart';
+import 'package:provider/provider.dart';
+import 'package:grad_project/providers/post_provider.dart';
 
 FirebaseUser currentUser;
 Firestore fs = Firestore.instance;
 Map<String, dynamic> data;
 QuerySnapshot posts;
+bool isFollowed;
+bool isFollowing;
 
-class MyProfile extends StatefulWidget {
+class UserProfile extends StatefulWidget {
+  final String uid;
+
+  UserProfile({@required this.uid});
+
   @override
-  _MyProfileState createState() => _MyProfileState();
+  _UserProfileState createState() => _UserProfileState();
 }
 
-class _MyProfileState extends State<MyProfile> {
+class _UserProfileState extends State<UserProfile> {
   bool isLoaded = false;
   @override
   Widget build(BuildContext context) {
-    return isLoaded ? Profile() : Center(child: CircularProgressIndicator());
+    return isLoaded ? Profile(uid: widget.uid) : Center(child: CircularProgressIndicator());
   }
 
   getData() async {
     currentUser = await FirebaseAuth.instance.currentUser();
-    data = await fs.collection('users').document(currentUser.uid).get().then((x) {
+    data = await fs.collection('users').document(widget.uid).get().then((x) {
       return x.data;
     });
-    posts = await fs.collection('posts').orderBy('created_at', descending: true).where('user_id', arrayContains: currentUser.uid).getDocuments();
+    posts = await fs.collection('posts').orderBy('created_at', descending: true).where('user_id', arrayContains: widget.uid).getDocuments();
     setState(() {
       isLoaded = true;
     });
+
+    await fs.collection('users').document(currentUser.uid).collection('my_followers').document(widget.uid).get().then((x){
+      if(x.exists){
+        setState(() {
+          isFollowing = true;
+        });
+      }
+      else if(!x.exists){
+        setState(() {
+          isFollowing = false;
+        });
+      }
+    }
+    );
+
+    await fs.collection('users').document(currentUser.uid).collection('following').document(widget.uid).get().then((x){
+    if(x.exists){
+      setState(() {
+        isFollowed = true;
+      });
+    }
+    else if(!x.exists){
+      setState(() {
+        isFollowed = false;
+      });
+    }
+  }
+  );
   }
 
   @override
@@ -39,6 +75,9 @@ class _MyProfileState extends State<MyProfile> {
 }
 
 class Profile extends StatefulWidget {
+  final String uid;
+
+  Profile({@required this.uid});
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -62,7 +101,7 @@ class _ProfileState extends State<Profile> {
             floating: true,
             expandedHeight: x.height / 1.7,
             flexibleSpace: FlexibleSpaceBar(
-              background: ProfileHeader(),
+              background: ProfileHeader(uid: widget.uid),
             ),
           ),
           SliverList(
@@ -88,6 +127,9 @@ class _ProfileState extends State<Profile> {
 }
 
 class ProfileHeader extends StatefulWidget {
+  final String uid;
+
+  ProfileHeader({@required this.uid});
   @override
   _ProfileHeaderState createState() => _ProfileHeaderState();
 }
@@ -102,7 +144,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             CoverProfilePicName(x: x),
-            EditProfileButton(x: x),
+            EditProfileButton(x: x, uid: widget.uid),
             SizedBox(height: x.height / 15),
             Bio(),
             Center(child: Stats(x: x)),
@@ -113,40 +155,72 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   }
 }
 
-class EditProfileButton extends StatelessWidget {
+class EditProfileButton extends StatefulWidget {
   const EditProfileButton({
     Key key,
     @required this.x,
+    @required this.uid,
   }) : super(key: key);
 
   final Size x;
+  final String uid;
 
+  @override
+  _EditProfileButtonState createState() => _EditProfileButtonState();
+}
+
+class _EditProfileButtonState extends State<EditProfileButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: x.width / (x.width / 8)),
+      padding: EdgeInsets.only(right: widget.x.width / (widget.x.width / 8)),
       child: Align(
         alignment: Alignment.centerRight,
-        child: FlatButton(
-          onPressed: (){
-            return showDialog(
-              context: context,
-              builder: (context){
-                return AlertDialog(
-                  title: Text('TODO: EDIT PROFILE'),
-                  content: Text('add profile customization'),
-                  actions: <Widget>[
-                    FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                    ],
-                  );
+        child: Column(
+          children: <Widget>[
+            FlatButton(
+              onPressed: () async{
+                if(isFollowed){
+                  await Provider.of<PostProvider>(context, listen: false).unFollowUser(widget.uid);
+                  print('unfollow');
+                  setState(() {
+                    isFollowed = !isFollowed;
+                  });
                 }
-              );
-          },
-          child: Text('Edit Profile'),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-            side: BorderSide(color: Colors.blue),
+                else{
+                  await Provider.of<PostProvider>(context, listen: false).followUser(widget.uid);
+                  print('follow');
+                  setState(() {
+                    isFollowed = !isFollowed;
+                  });
+                }
+              },
+              child: isFollowed !=null? isFollowed? Text('Unfollow') : Text('Follow') : Container(width: 0, height: 0,),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+                side: BorderSide(color: Colors.blue),
+              ),
+            ),
+          Container(
+            child: isFollowing != null ? isFollowing? Container(
+              // onLongPress: (){},
+              // child: Icon(Icons.undo),
+              width: 80,
+              height: 18,
+              decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2)
+              ),
+              child: Text(
+                'Follows you',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[700]
+                ),
+              ),
+            ) : Container(width: 0, height: 0) : Container(width: 0, height: 0),
           ),
+          ],
         ),
       ),
     );
