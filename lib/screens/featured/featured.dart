@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:grad_project/utils/text_styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:grad_project/Classes/Search.dart';
+import 'package:grad_project/Classes/AppDrawer.dart';
 
 FirebaseUser currentUser;
 Firestore fs = Firestore.instance;
@@ -16,7 +17,6 @@ getData() async {
   posts = await fs.collection('posts').where('user_id', arrayContains: currentUser.uid).getDocuments();
 }
 
-
 class Featured extends StatefulWidget {
   @override
   _FeaturedState createState() => _FeaturedState();
@@ -24,46 +24,35 @@ class Featured extends StatefulWidget {
 
 class _FeaturedState extends State<Featured> {
   bool isSearching = false;
+  var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
         length: 6,
         child: Scaffold(
+          key: _scaffoldKey,
+          drawer: new AppDrawer(),
           appBar: AppBar(
-            title: !isSearching ?
+            title:
             Text(
               "Discover",
-             style: AppTextStyles.appBarTitle,)
-                :TextField(
-              decoration: InputDecoration(
-                icon: Icon(Icons.search),
-                hintText: "search"),),
+             style: AppTextStyles.appBarTitle,),
             centerTitle: true,
             leading:
               IconButton(
                 icon: Icon(Icons.format_list_bulleted),
                 color: Colors.black,
-                onPressed: (){},
+                onPressed: () {
+                  _scaffoldKey.currentState.openDrawer();
+                },
               ),
             actions: <Widget>[
-              isSearching?
-              IconButton(
-                icon: Icon(Icons.cancel),
-                color: Colors.black,
-                onPressed: (){
-                  setState(() {
-                    this.isSearching = !this.isSearching;
-                  });
-                },
-              ):
               IconButton(
                 icon: Icon(Icons.search),
                 color: Colors.black,
                 onPressed: (){
-                  setState(() {
-                    this.isSearching = !this.isSearching;
-                  });
+                  showSearch(context: context, delegate: DataSearch());
                 },
               ),
               IconButton(
@@ -82,7 +71,7 @@ class _FeaturedState extends State<Featured> {
 //                    gradient: LinearGradient(
 //                        colors: [Colors.blueAccent, Colors.purpleAccent]),
                     borderRadius: BorderRadius.circular(50),
-                    color: Colors.blueAccent),
+                    color: Colors.blue),
                 tabs: [
                   Tab(
                     child: Align(
@@ -124,7 +113,7 @@ class _FeaturedState extends State<Featured> {
           ),
           body: TabBarView(
             children: <Widget>[
-              Center(
+              SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
                     Container(
@@ -136,7 +125,7 @@ class _FeaturedState extends State<Featured> {
                     Post(),
                     Post(),
                   ],
-                )
+                ),
               ),
               Center(
                   child: Column(
@@ -304,42 +293,3 @@ class Post extends StatelessWidget {
     );
   }
 }
-class CategoryButton extends StatelessWidget{
-  Widget build(BuildContext context){
-    return Scaffold(
-      body: FlatButton(
-        shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(5.0),),
-        padding: EdgeInsets.all(1.0),
-        onPressed: () {},
-        child: Image(
-          image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
-          //https://www.pngarts.com/files/3/Button-PNG-Picture.png
-          fit: BoxFit.fill,
-        ),
-      ),
-    ); //Scaffold
-  }
-}
-
-
-
-
-
-
-
-
-
-//                        FlatButton(
-//                          shape: new RoundedRectangleBorder(
-//                            borderRadius: new BorderRadius.circular(18.0),),
-//                          padding: EdgeInsets.all(1.0),
-//                          onPressed: () {},
-//                          child: Image(
-//                            image: NetworkImage('https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png'),
-//                            fit: BoxFit.fill,
-//                          ),
-//                        ),
-//                      ],
-//                    )  ),
-//              ),

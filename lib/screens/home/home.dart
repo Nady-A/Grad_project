@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:grad_project/utils/text_styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:grad_project/Classes/Search.dart';
+import 'package:grad_project/Classes/AppDrawer.dart';
 
 FirebaseUser currentUser;
 Firestore fs = Firestore.instance;
@@ -23,45 +24,34 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool isSearching = false;
+  var _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: new AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: !isSearching ?
+          title:
         Text(
           "Home",
-          style: AppTextStyles.appBarTitle,)
-            :TextField(
-          decoration: InputDecoration(
-              icon: Icon(Icons.search),
-              hintText: "search"),),
+          style: AppTextStyles.appBarTitle,),
         centerTitle: true,
         leading:
         IconButton(
           icon: Icon(Icons.format_list_bulleted),
           color: Colors.black,
-          onPressed: (){},
+          onPressed: () {
+            _scaffoldKey.currentState.openDrawer();
+          },
         ),
         actions: <Widget>[
-          isSearching?
-          IconButton(
-            icon: Icon(Icons.cancel),
-            color: Colors.black,
-            onPressed: (){
-              setState(() {
-                this.isSearching = !this.isSearching;
-              });
-            },
-          ):
           IconButton(
             icon: Icon(Icons.search),
             color: Colors.black,
             onPressed: (){
-              setState(() {
-                this.isSearching = !this.isSearching;
-              });
+              showSearch(context: context, delegate: DataSearch());
             },
           ),
           IconButton(
@@ -71,21 +61,18 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-
       body: Container(
         margin: EdgeInsets.all(15.0) ,
-        child: Center(
-          child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                children: <Widget>[
-                  Post(),
-                  Post(),
-                  Post(),
-                  Post(),
-                ],
-              ) ),
-        ),
+        child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: <Widget>[
+                Post(),
+                Post(),
+                Post(),
+                Post(),
+              ],
+            ) ),
       ),
 
 
@@ -182,3 +169,5 @@ class Post extends StatelessWidget {
     );
   }
 }
+
+
