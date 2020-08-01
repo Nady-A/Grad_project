@@ -4,19 +4,44 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/Classes/Search.dart';
 import 'package:grad_project/Classes/AppDrawer.dart';
+import 'package:grad_project/screens/profile/post_card.dart';
 
 FirebaseUser currentUser;
 Firestore fs = Firestore.instance;
-Map<String, dynamic> data;
+QuerySnapshot following;
 QuerySnapshot posts;
-getData() async {
-  currentUser = await FirebaseAuth.instance.currentUser();
-  data = await fs.collection('users').document(currentUser.uid).get().then((x) {
-    return x.data;
-  });
-  posts = await fs.collection('posts').where('user_id', arrayContains: currentUser.uid).getDocuments();
+
+class MyHome extends StatefulWidget {
+  @override
+  _MyHomeState createState() => _MyHomeState();
 }
 
+class _MyHomeState extends State<MyHome> {
+  bool isLoaded = false;
+  @override
+  Widget build(BuildContext context) {
+    return isLoaded ? Home() : Center(child: CircularProgressIndicator());
+  }
+
+  getData() async {
+    currentUser = await FirebaseAuth.instance.currentUser();
+    following = await fs.collection('users').document('uid').collection('following').getDocuments();
+    List tmp1 = [];
+    for(int i=0; i<following.documents.length; i++){
+      tmp1.add(following.documents[i].documentID.toString());
+    }
+    posts = await fs.collection('posts').where('user_ID',arrayContains: tmp1).getDocuments();
+    setState(() {
+      isLoaded = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+}
 
 class Home extends StatefulWidget {
   @override
@@ -33,7 +58,7 @@ class _HomeState extends State<Home> {
       drawer: new AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.white,
-          title:
+        title:
         Text(
           "Home",
           style: AppTextStyles.appBarTitle,),
@@ -67,107 +92,106 @@ class _HomeState extends State<Home> {
             scrollDirection: Axis.vertical,
             child: Column(
               children: <Widget>[
-                Post(),
-                Post(),
-                Post(),
-                Post(),
+                Post(
+                  post: posts.documents[1],
+                  uid:currentUser.uid,
+                )
+
               ],
             ) ),
       ),
-
-
     );
   }
 }
-class Post extends StatelessWidget {
-  //Post({this.post});
-
-  //final DocumentSnapshot post;
-  @override
-  Widget build(BuildContext context) {
-    Size x = MediaQuery.of(context).size;
-    return GestureDetector(
-      onTap: (){
-        return showDialog(
-            context: context,
-            builder: (context){
-              return AlertDialog(
-                title: Text('TODO: POST PAGE'),
-                // content: Text('go to post with id: ${post.documentID}'),
-                actions: <Widget>[
-                  FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                ],
-              );
-            }
-        );
-      },
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              height: x.height / 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.grey,
-                image: DecorationImage(
-                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              foregroundDecoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                gradient: LinearGradient(
-                  colors: [Colors.black, Colors.transparent],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-              ),
-            ),
-            Positioned(
-              top: x.height / 4.75,
-              left: x.width / 15,
-              child: Text(
-                'title',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Positioned(
-              top: x.height / 5.25,
-              right: x.width / 15,
-              child: IconButton(
-                onPressed: (){
-                  return showDialog(
-                      context: context,
-                      builder: (context){
-                        return AlertDialog(
-                          title: Text('TODO: LIKE'),
-                          content: Text('add like functionality'),
-                          actions: <Widget>[
-                            FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                          ],
-                        );
-                      }
-                  );
-                },
-                icon: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 25,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//class Post extends StatelessWidget {
+//  //Post({this.post});
+//
+//  //final DocumentSnapshot post;
+//  @override
+//  Widget build(BuildContext context) {
+//    Size x = MediaQuery.of(context).size;
+//    return GestureDetector(
+//      onTap: (){
+//        return showDialog(
+//            context: context,
+//            builder: (context){
+//              return AlertDialog(
+//                title: Text('TODO: POST PAGE'),
+//                // content: Text('go to post with id: ${post.documentID}'),
+//                actions: <Widget>[
+//                  FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
+//                ],
+//              );
+//            }
+//        );
+//      },
+//      child: Padding(
+//        padding: EdgeInsets.all(8.0),
+//        child: Stack(
+//          alignment: Alignment.center,
+//          children: <Widget>[
+//            Container(
+//              margin: EdgeInsets.symmetric(horizontal: 10),
+//              height: x.height / 4,
+//              decoration: BoxDecoration(
+//                borderRadius: BorderRadius.circular(15),
+//                color: Colors.grey,
+//                image: DecorationImage(
+//                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
+//                  fit: BoxFit.cover,
+//                ),
+//              ),
+//              foregroundDecoration: BoxDecoration(
+//                borderRadius: BorderRadius.circular(15),
+//                gradient: LinearGradient(
+//                  colors: [Colors.black, Colors.transparent],
+//                  begin: Alignment.bottomCenter,
+//                  end: Alignment.topCenter,
+//                ),
+//              ),
+//            ),
+//            Positioned(
+//              top: x.height / 4.75,
+//              left: x.width / 15,
+//              child: Text(
+//                'title',
+//                style: TextStyle(
+//                  color: Colors.white,
+//                  fontSize: 20,
+//                  fontWeight: FontWeight.w500,
+//                ),
+//              ),
+//            ),
+//            Positioned(
+//              top: x.height / 5.25,
+//              right: x.width / 15,
+//              child: IconButton(
+//                onPressed: (){
+//                  return showDialog(
+//                      context: context,
+//                      builder: (context){
+//                        return AlertDialog(
+//                          title: Text('TODO: LIKE'),
+//                          content: Text('add like functionality'),
+//                          actions: <Widget>[
+//                            FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
+//                          ],
+//                        );
+//                      }
+//                  );
+//                },
+//                icon: Icon(
+//                  Icons.favorite_border,
+//                  color: Colors.white,
+//                  size: 25,
+//                ),
+//              ),
+//            ),
+//          ],
+//        ),
+//      ),
+//    );
+//  }
+//}
 
 
