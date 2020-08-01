@@ -4,18 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/Classes/Search.dart';
 import 'package:grad_project/Classes/AppDrawer.dart';
-
-FirebaseUser currentUser;
-Firestore fs = Firestore.instance;
-Map<String, dynamic> data;
-QuerySnapshot posts;
-getData() async {
-  currentUser = await FirebaseAuth.instance.currentUser();
-  data = await fs.collection('users').document(currentUser.uid).get().then((x) {
-    return x.data;
-  });
-  posts = await fs.collection('posts').where('user_id', arrayContains: currentUser.uid).getDocuments();
-}
+import 'package:grad_project/screens/profile/post_card.dart';
 
 
 class Home extends StatefulWidget {
@@ -26,6 +15,45 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  bool _loadingDone = false;
+  var posts = [];
+  var userId;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHomeAndChangeState();
+  }
+
+  void fetchHomeAndChangeState() async {
+
+    Firestore _db = Firestore.instance;
+    await FirebaseAuth.instance.currentUser().then((res) => userId = res.uid);
+    var aggregateFetchedPosts = [];
+    var following = await _db
+        .collection('users')
+        .document(userId)
+        .collection('following')
+        .getDocuments();
+    for (var f in following.documents) {
+      print(f.documentID);
+      await _db
+          .collection('posts')
+          .where('user_id', arrayContains: f.documentID)
+          .orderBy('created_at', descending: true)
+          .limit(10)
+          .getDocuments()
+          .then((fetchedUserPosts) {
+        for (var post in fetchedUserPosts.documents)
+          aggregateFetchedPosts.add(post);
+      });
+    }
+    posts = aggregateFetchedPosts;
+    setState(() {
+      _loadingDone = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,13 +61,12 @@ class _HomeState extends State<Home> {
       drawer: new AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.white,
-          title:
-        Text(
+        title: Text(
           "Home",
-          style: AppTextStyles.appBarTitle,),
+          style: AppTextStyles.appBarTitle,
+        ),
         centerTitle: true,
-        leading:
-        IconButton(
+        leading: IconButton(
           icon: Icon(Icons.format_list_bulleted),
           color: Colors.black,
           onPressed: () {
@@ -50,124 +77,57 @@ class _HomeState extends State<Home> {
           IconButton(
             icon: Icon(Icons.search),
             color: Colors.black,
-            onPressed: (){
+            onPressed: () {
               showSearch(context: context, delegate: DataSearch());
             },
           ),
           IconButton(
-            icon: Icon(Icons.sort),
+            icon: Icon(Icons.refresh),
             color: Colors.black,
-            onPressed: (){},
+            onPressed: () {
+              print('pressed refresh');
+              setState(() {
+                _loadingDone = false;
+              });
+              fetchHomeAndChangeState();
+            },
           )
         ],
       ),
       body: Container(
-        margin: EdgeInsets.all(15.0) ,
+        margin: EdgeInsets.all(15.0),
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Post(),
-                Post(),
-                Post(),
-                Post(),
+                Text(
+                  'Latest from creators you follow',
+                  textAlign: TextAlign.start,
+                  style: AppTextStyles.homeHeading,
+                ),
+                posts.isEmpty
+                    ? Center(
+                        child: Text('You have no new posts'),
+                      )
+                    : _loadingDone
+                        ? Column(
+                            children: posts.map((post) {
+                              return Post(
+                                post: post,
+                                uid: userId,
+                              );
+                            }).toList(),
+                          )
+                        : Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
               ],
-            ) ),
-      ),
-
-
-    );
-  }
-}
-class Post extends StatelessWidget {
-  //Post({this.post});
-
-  //final DocumentSnapshot post;
-  @override
-  Widget build(BuildContext context) {
-    Size x = MediaQuery.of(context).size;
-    return GestureDetector(
-      onTap: (){
-        return showDialog(
-            context: context,
-            builder: (context){
-              return AlertDialog(
-                title: Text('TODO: POST PAGE'),
-                // content: Text('go to post with id: ${post.documentID}'),
-                actions: <Widget>[
-                  FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                ],
-              );
-            }
-        );
-      },
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              height: x.height / 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.grey,
-                image: DecorationImage(
-                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              foregroundDecoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                gradient: LinearGradient(
-                  colors: [Colors.black, Colors.transparent],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-              ),
-            ),
-            Positioned(
-              top: x.height / 4.75,
-              left: x.width / 15,
-              child: Text(
-                'title',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Positioned(
-              top: x.height / 5.25,
-              right: x.width / 15,
-              child: IconButton(
-                onPressed: (){
-                  return showDialog(
-                      context: context,
-                      builder: (context){
-                        return AlertDialog(
-                          title: Text('TODO: LIKE'),
-                          content: Text('add like functionality'),
-                          actions: <Widget>[
-                            FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                          ],
-                        );
-                      }
-                  );
-                },
-                icon: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 25,
-                ),
-              ),
-            ),
-          ],
-        ),
+            )),
       ),
     );
   }
 }
-
-

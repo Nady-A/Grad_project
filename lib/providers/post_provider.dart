@@ -48,16 +48,16 @@ class PostProvider extends ChangeNotifier {
   _getLikeStatus(String postId) async {
     bool inLikes;
     var user = await _firebaseAuth.currentUser();
-    CollectionReference likesRef = _db.collection('users').document(user.uid).collection('likes');
-      //Add post to my likes collection
-    await likesRef.document(postId).get().then((result){
-      if(result.exists){
+    CollectionReference likesRef =
+        _db.collection('users').document(user.uid).collection('likes');
+    //Add post to my likes collection
+    await likesRef.document(postId).get().then((result) {
+      if (result.exists) {
         inLikes = true;
-      }else{
+      } else {
         inLikes = false;
       }
-    }
-    );
+    });
     /*await _db
         .collection('users')
         .document(user.uid)
@@ -252,9 +252,10 @@ class PostProvider extends ChangeNotifier {
   Future<String> addToLikes(String postId) async {
     try {
       var user = await _firebaseAuth.currentUser();
-      CollectionReference likesRef = _db.collection('users').document(user.uid).collection('likes');
+      CollectionReference likesRef =
+          _db.collection('users').document(user.uid).collection('likes');
       //Add post to my likes collection
-      await likesRef.document(postId).setData({'place_holder' : 'place_holder'});
+      await likesRef.document(postId).setData({'place_holder': 'place_holder'});
       /*await _db
           .collection('users')
           .document(user.uid)
@@ -275,7 +276,8 @@ class PostProvider extends ChangeNotifier {
     try {
       var user = await _firebaseAuth.currentUser();
       //Search for post id then delete document containing it
-      CollectionReference likesRef = _db.collection('users').document(user.uid).collection('likes');    
+      CollectionReference likesRef =
+          _db.collection('users').document(user.uid).collection('likes');
       await likesRef.document(postId).delete();
       /*await _db
           .collection('users')
@@ -395,6 +397,5 @@ class PostProvider extends ChangeNotifier {
     //Delete my entry from his followers list
     await userFollowerRef.document(myId).delete();
   }
-
   //Post get post => _post;
 }

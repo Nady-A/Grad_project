@@ -171,11 +171,11 @@ class _AddBodyState extends State<AddBody> {
                 color: Colors.blue,
                 onPressed: () async {
                   FileType type;
-
                   if (selectedCategory == 'Music') {
-                    type = FileType.AUDIO;
+                    type = FileType.audio
+                    ;
                   } else {
-                    type = FileType.IMAGE;
+                    type = FileType.image;
                   }
 
                   List<File> x = await FilePicker.getMultiFile(type: type);

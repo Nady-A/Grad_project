@@ -43,7 +43,13 @@ class AppTextStyles {
   );
 
   static TextStyle postScreenSectionTitle = TextStyle(
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: FontWeight.bold,
+  );
+
+  static TextStyle homeHeading = TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    color: Colors.black.withOpacity(0.7),
   );
 }

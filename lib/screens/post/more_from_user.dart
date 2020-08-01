@@ -48,9 +48,7 @@ class _MorePostsFromCreatorState extends State<MorePostsFromCreator> {
                     ),
                   ],
                 )
-              : Center(
-                  child: Text('User has no posts'),
-                )
+              : Container( height: 0, width: 0,)
           : Center(
               child: CircularProgressIndicator(),
             ),
