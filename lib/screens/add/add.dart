@@ -46,14 +46,12 @@ class AddBody extends StatefulWidget {
 
 class _AddBodyState extends State<AddBody> {
   List<String> categories = [
-    'Music',
     'Photography',
     'Graphic Design',
-    'Sports',
+    'Drawing',
     'Crafts',
-    'Acting',
   ];
-  String selectedCategory = 'Music';
+  String selectedCategory = 'Photography';
   List<File> pickedFiles = [];
   List<String> tags = [];
   List<List<String>> coAuthors = [];
@@ -172,10 +170,10 @@ class _AddBodyState extends State<AddBody> {
                 onPressed: () async {
                   FileType type;
                   if (selectedCategory == 'Music') {
-                    type = FileType.AUDIO
+                    type = FileType.audio
                     ;
                   } else {
-                    type = FileType.IMAGE;
+                    type = FileType.image;
                   }
 
                   List<File> x = await FilePicker.getMultiFile(type: type);
