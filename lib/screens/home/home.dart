@@ -6,7 +6,6 @@ import 'package:grad_project/Classes/Search.dart';
 import 'package:grad_project/Classes/AppDrawer.dart';
 import 'package:grad_project/screens/profile/post_card.dart';
 
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -67,7 +66,7 @@ class _HomeState extends State<Home> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.format_list_bulleted),
+          icon: Icon(Icons.menu),
           color: Colors.black,
           onPressed: () {
             _scaffoldKey.currentState.openDrawer();

@@ -4,18 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/Classes/Search.dart';
 import 'package:grad_project/Classes/AppDrawer.dart';
-
-FirebaseUser currentUser;
-Firestore fs = Firestore.instance;
-Map<String, dynamic> data;
-QuerySnapshot posts;
-getData() async {
-  currentUser = await FirebaseAuth.instance.currentUser();
-  data = await fs.collection('users').document(currentUser.uid).get().then((x) {
-    return x.data;
-  });
-  posts = await fs.collection('posts').where('user_id', arrayContains: currentUser.uid).getDocuments();
-}
+import 'package:grad_project/screens/profile/post_card.dart';
 
 class Featured extends StatefulWidget {
   @override
@@ -23,8 +12,46 @@ class Featured extends StatefulWidget {
 }
 
 class _FeaturedState extends State<Featured> {
-  bool isSearching = false;
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  bool _loadingDone = false;
+  var posts = [];
+  var userId;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHomeAndChangeState();
+  }
+  void fetchHomeAndChangeState() async {
+
+    Firestore _db = Firestore.instance;
+    await FirebaseAuth.instance.currentUser().then((res) => userId = res.uid);
+    var aggregateFetchedPosts = [];
+    var following = await _db
+        .collection('users')
+        .document(userId)
+        .collection('following')
+        .getDocuments();
+    for (var f in following.documents) {
+      print(f.documentID);
+      await _db
+          .collection('posts')
+          .where('user_id', arrayContains: f.documentID)
+          .orderBy('created_at', descending: true)
+          .limit(10)
+          .getDocuments()
+          .then((fetchedUserPosts) {
+        for (var post in fetchedUserPosts.documents)
+          aggregateFetchedPosts.add(post);
+      });
+    }
+    posts = aggregateFetchedPosts;
+    setState(() {
+      _loadingDone = true;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +68,7 @@ class _FeaturedState extends State<Featured> {
             centerTitle: true,
             leading:
               IconButton(
-                icon: Icon(Icons.format_list_bulleted),
+                icon: Icon(Icons.menu),
                 color: Colors.black,
                 onPressed: () {
                   _scaffoldKey.currentState.openDrawer();
@@ -122,8 +149,7 @@ class _FeaturedState extends State<Featured> {
                         style: AppTextStyles.appBarTitle,
                       ),
                     ),
-                    Post(),
-                    Post(),
+                   ///featured tab here
                   ],
                 ),
               ),
@@ -136,8 +162,7 @@ class _FeaturedState extends State<Featured> {
                           style: AppTextStyles.appBarTitle,
                         ),
                       ),
-                      Post(),
-                      Post(),
+                      ///Music tab here
                     ],
                   )
                ),
@@ -150,8 +175,7 @@ class _FeaturedState extends State<Featured> {
                           style: AppTextStyles.appBarTitle,
                         ),
                       ),
-                      Post(),
-                      Post(),
+                      ///Photography tab here
                     ],
                   )
               ),
@@ -164,8 +188,7 @@ class _FeaturedState extends State<Featured> {
                           style: AppTextStyles.appBarTitle,
                         ),
                       ),
-                      Post(),
-                      Post(),
+                      ///Graphic Design tab here
                     ],
                   )
               ),
@@ -178,8 +201,7 @@ class _FeaturedState extends State<Featured> {
                           style: AppTextStyles.appBarTitle,
                         ),
                       ),
-                      Post(),
-                      Post(),
+                      ///Drawing tab here
                     ],
                   )
               ),
@@ -192,8 +214,7 @@ class _FeaturedState extends State<Featured> {
                           style: AppTextStyles.appBarTitle,
                         ),
                       ),
-                      Post(),
-                      Post(),
+                      ///Crafts tab here
                     ],
                   )
               ),
@@ -203,93 +224,93 @@ class _FeaturedState extends State<Featured> {
     );
   }
 }
-class Post extends StatelessWidget {
-  //Post({this.post});
-
-  //final DocumentSnapshot post;
-  @override
-  Widget build(BuildContext context) {
-    Size x = MediaQuery.of(context).size;
-    return GestureDetector(
-      onTap: (){
-        return showDialog(
-            context: context,
-            builder: (context){
-              return AlertDialog(
-                title: Text('TODO: POST PAGE'),
-                // content: Text('go to post with id: ${post.documentID}'),
-                actions: <Widget>[
-                  FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                ],
-              );
-            }
-        );
-      },
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              height: x.height / 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.grey,
-                image: DecorationImage(
-                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              foregroundDecoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                gradient: LinearGradient(
-                  colors: [Colors.black, Colors.transparent],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-              ),
-            ),
-            Positioned(
-              top: x.height / 4.75,
-              left: x.width / 15,
-              child: Text(
-                'title',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Positioned(
-              top: x.height / 5.25,
-              right: x.width / 15,
-              child: IconButton(
-                onPressed: (){
-                  return showDialog(
-                      context: context,
-                      builder: (context){
-                        return AlertDialog(
-                          title: Text('TODO: LIKE'),
-                          content: Text('add like functionality'),
-                          actions: <Widget>[
-                            FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                          ],
-                        );
-                      }
-                  );
-                },
-                icon: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 25,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//class Post extends StatelessWidget {
+//  //Post({this.post});
+//
+//  //final DocumentSnapshot post;
+//  @override
+//  Widget build(BuildContext context) {
+//    Size x = MediaQuery.of(context).size;
+//    return GestureDetector(
+//      onTap: (){
+//        return showDialog(
+//            context: context,
+//            builder: (context){
+//              return AlertDialog(
+//                title: Text('TODO: POST PAGE'),
+//                // content: Text('go to post with id: ${post.documentID}'),
+//                actions: <Widget>[
+//                  FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
+//                ],
+//              );
+//            }
+//        );
+//      },
+//      child: Padding(
+//        padding: EdgeInsets.all(8.0),
+//        child: Stack(
+//          alignment: Alignment.center,
+//          children: <Widget>[
+//            Container(
+//              margin: EdgeInsets.symmetric(horizontal: 10),
+//              height: x.height / 4,
+//              decoration: BoxDecoration(
+//                borderRadius: BorderRadius.circular(15),
+//                color: Colors.grey,
+//                image: DecorationImage(
+//                  image: NetworkImage("https://i.gyazo.com/8ed3f03ef359007c5d8e3fda87e182b4.png"),
+//                  fit: BoxFit.cover,
+//                ),
+//              ),
+//              foregroundDecoration: BoxDecoration(
+//                borderRadius: BorderRadius.circular(15),
+//                gradient: LinearGradient(
+//                  colors: [Colors.black, Colors.transparent],
+//                  begin: Alignment.bottomCenter,
+//                  end: Alignment.topCenter,
+//                ),
+//              ),
+//            ),
+//            Positioned(
+//              top: x.height / 4.75,
+//              left: x.width / 15,
+//              child: Text(
+//                'title',
+//                style: TextStyle(
+//                  color: Colors.white,
+//                  fontSize: 20,
+//                  fontWeight: FontWeight.w500,
+//                ),
+//              ),
+//            ),
+//            Positioned(
+//              top: x.height / 5.25,
+//              right: x.width / 15,
+//              child: IconButton(
+//                onPressed: (){
+//                  return showDialog(
+//                      context: context,
+//                      builder: (context){
+//                        return AlertDialog(
+//                          title: Text('TODO: LIKE'),
+//                          content: Text('add like functionality'),
+//                          actions: <Widget>[
+//                            FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
+//                          ],
+//                        );
+//                      }
+//                  );
+//                },
+//                icon: Icon(
+//                  Icons.favorite_border,
+//                  color: Colors.white,
+//                  size: 25,
+//                ),
+//              ),
+//            ),
+//          ],
+//        ),
+//      ),
+//    );
+//  }
+//}
