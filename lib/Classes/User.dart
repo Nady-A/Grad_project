@@ -31,7 +31,7 @@ class User{
     name: json["name"],
     bio: json["bio"],
     profilePictureUrl: json["profile_picture_url"],
-    coverPictureUrl: json['coverPictureUrl'],
+    coverPictureUrl: json['cover_picture_url'],
     followingCount: json["following_count"],
     followerCount: json["follower_count"],
     postCount: json["post_count"],);

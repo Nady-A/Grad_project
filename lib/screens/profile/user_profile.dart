@@ -25,7 +25,51 @@ class _UserProfileState extends State<UserProfile> {
   bool isLoaded = false;
   @override
   Widget build(BuildContext context) {
-    return isLoaded ? Profile(uid: widget.uid) : Center(child: CircularProgressIndicator());
+    Size x = MediaQuery.of(context).size;
+    return isLoaded ? Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            isLoaded = false;
+          });
+          getData();
+        },
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.grey[200],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25)
+                ),
+              ),
+              floating: true,
+              expandedHeight: x.height / 1.7,
+              flexibleSpace: FlexibleSpaceBar(
+                background: ProfileHeader(uid: widget.uid),
+              ),
+            ),
+            SliverList(
+              delegate: posts.documents.length != 0 ? SliverChildBuilderDelegate(
+                (context, index) => Post(
+                  post: posts.documents[index],
+                  uid: currentUser.uid,
+                ),
+                childCount: posts.documents.length,
+              ) : SliverChildListDelegate(<Widget>[Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'User has no posts',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20),
+                ),
+              )])
+            ),
+          ],
+        ),
+      ),
+    ) : Center(child: CircularProgressIndicator());
   }
 
   getData() async {
@@ -71,58 +115,6 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     super.initState();
     getData();
-  }
-}
-
-class Profile extends StatefulWidget {
-  final String uid;
-
-  Profile({@required this.uid});
-
-  @override
-  _ProfileState createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
-  @override
-  Widget build(BuildContext context) {
-    Size x = MediaQuery.of(context).size;
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: Colors.grey[200],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25)
-              ),
-            ),
-            floating: true,
-            expandedHeight: x.height / 1.7,
-            flexibleSpace: FlexibleSpaceBar(
-              background: ProfileHeader(uid: widget.uid),
-            ),
-          ),
-          SliverList(
-            delegate: posts.documents.length != 0 ? SliverChildBuilderDelegate(
-              (context, index) => Post(
-                post: posts.documents[index],
-                uid: currentUser.uid,
-              ),
-              childCount: posts.documents.length,
-            ) : SliverChildListDelegate(<Widget>[Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'User has no posts',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20),
-              ),
-            )])
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -267,13 +259,13 @@ class NameLocation extends StatelessWidget {
             fontWeight: FontWeight.bold
           ),
         ),
-      Text(
-        'Alexandria, Egypt',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 15,
-        ),
-      ),
+      // Text(
+      //   'Alexandria, Egypt',
+      //   textAlign: TextAlign.center,
+      //   style: TextStyle(
+      //     fontSize: 15,
+      //   ),
+      // ),
       ],
     );
   }
@@ -292,7 +284,7 @@ class Stats extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           StatSection(
-            count: data['post_count'].toString(),
+            count: posts.documents.length.toString(),
             label: 'Posts',
           ),
           StatSection(

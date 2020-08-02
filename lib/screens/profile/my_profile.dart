@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:grad_project/Classes/AppDrawer.dart';
+import 'package:grad_project/screens/profile/edit_profile.dart';
 import 'package:grad_project/screens/profile/post_card.dart';
 
 FirebaseUser currentUser;
@@ -17,7 +19,52 @@ class _MyProfileState extends State<MyProfile> {
   bool isLoaded = false;
   @override
   Widget build(BuildContext context) {
-    return isLoaded ? Profile() : Center(child: CircularProgressIndicator());
+    Size x = MediaQuery.of(context).size;
+    return isLoaded ? Scaffold(
+      drawer: AppDrawer(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            isLoaded = false;
+          });
+          getData();
+        },
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.grey[200],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25)
+                ),
+              ),
+              floating: true,
+              expandedHeight: x.height / 1.7,
+              flexibleSpace: FlexibleSpaceBar(
+                background: ProfileHeader(),
+              ),
+            ),
+            SliverList(
+              delegate: posts.documents.length != 0 ? SliverChildBuilderDelegate(
+                (context, index) => Post(
+                  post: posts.documents[index],
+                  uid: currentUser.uid,
+                ),
+                childCount: posts.documents.length,
+              ) : SliverChildListDelegate(<Widget>[Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'User has no posts',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20),
+                ),
+              )])
+            ),
+          ],
+        ),
+      ),
+    ) : Center(child: CircularProgressIndicator());
   }
 
   getData() async {
@@ -35,55 +82,6 @@ class _MyProfileState extends State<MyProfile> {
   void initState() {
     super.initState();
     getData();
-  }
-}
-
-class Profile extends StatefulWidget {
-
-  @override
-  _ProfileState createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
-  @override
-  Widget build(BuildContext context) {
-    Size x = MediaQuery.of(context).size;
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: Colors.grey[200],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25)
-              ),
-            ),
-            floating: true,
-            expandedHeight: x.height / 1.7,
-            flexibleSpace: FlexibleSpaceBar(
-              background: ProfileHeader(),
-            ),
-          ),
-          SliverList(
-            delegate: posts.documents.length != 0 ? SliverChildBuilderDelegate(
-              (context, index) => Post(
-                post: posts.documents[index],
-                uid: currentUser.uid,
-              ),
-              childCount: posts.documents.length,
-            ) : SliverChildListDelegate(<Widget>[Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'User has no posts',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20),
-              ),
-            )])
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -129,18 +127,7 @@ class EditProfileButton extends StatelessWidget {
         alignment: Alignment.centerRight,
         child: FlatButton(
           onPressed: (){
-            return showDialog(
-              context: context,
-              builder: (context){
-                return AlertDialog(
-                  title: Text('TODO: EDIT PROFILE'),
-                  content: Text('add profile customization'),
-                  actions: <Widget>[
-                    FlatButton(onPressed: (){Navigator.of(context).pop();}, child: Text('close')),
-                    ],
-                  );
-                }
-              );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(uid: currentUser.uid,)));
           },
           child: Text('Edit Profile'),
           shape: RoundedRectangleBorder(
@@ -193,13 +180,13 @@ class NameLocation extends StatelessWidget {
             fontWeight: FontWeight.bold
           ),
         ),
-      Text(
-        'Alexandria, Egypt',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 15,
-        ),
-      ),
+      // Text(
+      //   'Alexandria, Egypt',
+      //   textAlign: TextAlign.center,
+      //   style: TextStyle(
+      //     fontSize: 15,
+      //   ),
+      // ),
       ],
     );
   }
@@ -218,7 +205,7 @@ class Stats extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           StatSection(
-            count: data['post_count'].toString(),
+            count: posts.documents.length.toString(),
             label: 'Posts',
           ),
           StatSection(

@@ -172,10 +172,10 @@ class _AddBodyState extends State<AddBody> {
                 onPressed: () async {
                   FileType type;
                   if (selectedCategory == 'Music') {
-                    type = FileType.audio
+                    type = FileType.AUDIO
                     ;
                   } else {
-                    type = FileType.image;
+                    type = FileType.IMAGE;
                   }
 
                   List<File> x = await FilePicker.getMultiFile(type: type);
