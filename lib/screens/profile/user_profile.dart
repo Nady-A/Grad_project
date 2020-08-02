@@ -45,7 +45,7 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ),
               floating: true,
-              expandedHeight: x.height / 1.7,
+              expandedHeight: x.width,
               flexibleSpace: FlexibleSpaceBar(
                 background: ProfileHeader(uid: widget.uid),
               ),
@@ -137,7 +137,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           children: <Widget>[
             CoverProfilePicName(x: x),
             EditProfileButton(x: x, uid: widget.uid),
-            SizedBox(height: x.height / 15),
+            SizedBox(height: x.width / 10),
             Bio(),
             Center(child: Stats(x: x)),
           ],
@@ -279,7 +279,7 @@ class Stats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: x.width / 1.1,
-      height: x.height / 10,
+      height: x.width / 5,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -344,7 +344,7 @@ class CoverProfilePicName extends StatelessWidget {
         overflow: Overflow.visible,
         children: <Widget>[
           Container(
-            height: x.height / 4.5,
+            height: x.width / 2.6,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage(data['cover_picture_url']),
