@@ -28,6 +28,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           ListTile(
+            leading: Icon(Icons.favorite),
             title: Text("Favorites"),
             onTap: () async {
               FirebaseUser user = await FirebaseAuth.instance.currentUser();
@@ -36,6 +37,7 @@ class _AppDrawerState extends State<AppDrawer> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.exit_to_app),
             title: Text('Log Out'),
             onTap: () async{
               await Provider.of<Authenticator>(context).signOut();
