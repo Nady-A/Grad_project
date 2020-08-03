@@ -115,4 +115,15 @@ class Authenticator extends ChangeNotifier {
     print('b');
     _user = await _firebaseAuth.currentUser();
   }
+
+  signOut() async{
+    print('logout');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', null);
+    await prefs.setString('password', null);
+    await _firebaseAuth.signOut();
+    _status = Status.Unauthenticated;
+    notifyListeners();
+
+  }
 }

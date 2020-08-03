@@ -5,9 +5,16 @@ class Splash extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FlutterLogo(
-          size: 128,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset('assets/Logo.png'),
+            Image.asset('assets/Talentya.png'),
+          ],
         ),
+//        child: FlutterLogo(
+//          size: 128,
+//        ),
       ),
     );
   }

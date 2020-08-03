@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/screens/profile/favorites.dart';
-
+import 'package:grad_project/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class AppDrawer extends StatefulWidget {
   @override
@@ -16,11 +17,13 @@ class _AppDrawerState extends State<AppDrawer> {
       child: ListView(
         children: <Widget>[
           DrawerHeader(
-            child: Align(child: Text('Talentya'), alignment: Alignment.bottomCenter),
+//            child: Align(child: Text('Talentya'), alignment: Alignment.bottomCenter),
+            child: Align(child: Image.asset('assets/Talentya.png') , alignment: Alignment.bottomCenter,),
             decoration: BoxDecoration(
-              color: Colors.blue.shade100,
+//              color: Colors.blue.shade100,
               image: DecorationImage(
-                image: NetworkImage('https://firebasestorage.googleapis.com/v0/b/talentapp-dc5b9.appspot.com/o/files%2Flogopng.png?alt=media&token=aeec9206-2ed6-4790-9df9-5cff2247dfd9'),
+                image: AssetImage('assets/Logo.png'),
+//                image: NetworkImage('https://firebasestorage.googleapis.com/v0/b/talentapp-dc5b9.appspot.com/o/files%2Flogopng.png?alt=media&token=aeec9206-2ed6-4790-9df9-5cff2247dfd9'),
               ),
             ),
           ),
@@ -34,6 +37,9 @@ class _AppDrawerState extends State<AppDrawer> {
           ),
           ListTile(
             title: Text('Log Out'),
+            onTap: () async{
+              await Provider.of<Authenticator>(context).signOut();
+            },
           ),
         ],
       ),
