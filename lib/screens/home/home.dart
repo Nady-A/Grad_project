@@ -25,7 +25,6 @@ class _HomeState extends State<Home> {
   }
 
   void fetchHomeAndChangeState() async {
-
     Firestore _db = Firestore.instance;
     await FirebaseAuth.instance.currentUser().then((res) => userId = res.uid);
     var aggregateFetchedPosts = [];
@@ -80,52 +79,49 @@ class _HomeState extends State<Home> {
               showSearch(context: context, delegate: DataSearch());
             },
           ),
-          IconButton(
-            icon: Icon(Icons.refresh),
-            color: Colors.black,
-            onPressed: () {
-              print('pressed refresh');
-              setState(() {
-                _loadingDone = false;
-              });
-              fetchHomeAndChangeState();
-            },
-          )
         ],
       ),
       body: Container(
         margin: EdgeInsets.all(15.0),
-        child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Latest from creators you follow',
-                  textAlign: TextAlign.start,
-                  style: AppTextStyles.homeHeading,
-                ),
-                posts.isEmpty
-                    ? Center(
-                        child: Text('You have no new posts'),
-                      )
-                    : _loadingDone
-                        ? Column(
-                            children: posts.map((post) {
-                              return Post(
-                                post: post,
-                                uid: userId,
-                              );
-                            }).toList(),
-                          )
-                        : Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-              ],
-            )),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              _loadingDone = false;
+            });
+            fetchHomeAndChangeState();
+          },
+          child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Latest from creators you follow',
+                    textAlign: TextAlign.start,
+                    style: AppTextStyles.homeHeading,
+                  ),
+                  posts.isEmpty
+                      ? Center(
+                          child: Text('You have no new posts'),
+                        )
+                      : _loadingDone
+                          ? Column(
+                              children: posts.map((post) {
+                                return Post(
+                                  post: post,
+                                  uid: userId,
+                                );
+                              }).toList(),
+                            )
+                          : Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                ],
+              )),
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grad_project/utils/text_styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,8 +30,8 @@ class _FeaturedState extends State<Featured> {
     super.initState();
     fetchHomeAndChangeState();
   }
-  void fetchHomeAndChangeState() async {
 
+  void fetchHomeAndChangeState() async {
     Firestore _db = Firestore.instance;
     await FirebaseAuth.instance.currentUser().then((res) => userId = res.uid);
     var aggregateFetchedFeaturedPosts = [];
@@ -38,55 +39,70 @@ class _FeaturedState extends State<Featured> {
     var aggregateFetchedGraphicDesignPosts = [];
     var aggregateFetchedDrawingPosts = [];
     var aggregateFetchedCraftsPosts = [];
-    var featured = await _db
-    .collection('posts')
-    .where('category', isEqualTo: 'Photography')
-    .orderBy('likes',descending: true)
-    .limit(10)
-    .getDocuments()
-    .then((fetchedUserPosts){
-      for (var post in fetchedUserPosts.documents)
-          aggregateFetchedFeaturedPosts.add(post);
-      print(aggregateFetchedFeaturedPosts);
-    }
-    );
+//    var featured = await _db
+//        .collection('posts')
+//        .where('created_at', isGreaterThan: 1)
+//        .orderBy('created_at', descending: true)
+//        .where('likes', isGreaterThan: 3)
+//        .limit(10)
+//        .getDocuments()
+//        .then((fetchedUserPosts) {
+//      for (var post in fetchedUserPosts.documents)
+//        aggregateFetchedFeaturedPosts.add(post);
+//      print(aggregateFetchedFeaturedPosts);
+//    });
+//    var featured = await _db
+//    .collection('posts')
+//    .getDocuments()
+//    .then((fetchedUserPosts){
+//       = fetchedUserPosts.documents.where((element) => element.data['likes'] > 3 && element.data['created_at'] > 1).toList();
+//
+//    });
+
+    aggregateFetchedFeaturedPosts = await _db
+        .collection('posts')
+        .where('likes', isGreaterThan: 3)
+        .getDocuments()
+        .then((x) => x.documents
+            .where((element) => element.data['created_at'] > lastWeek.millisecondsSinceEpoch)
+            .toList());
     var photograph = await _db
         .collection('posts')
-        .where('category',isEqualTo: 'Photography')
-        .orderBy('likes',descending: true)
+        .where('category', isEqualTo: 'Photography')
+        .orderBy('likes', descending: true)
         .limit(10)
         .getDocuments()
-        .then((fetchedUserPosts){
+        .then((fetchedUserPosts) {
       for (var postP in fetchedUserPosts.documents)
         aggregateFetchedPhotographyPosts.add(postP);
     });
     var graphicDesign = await _db
         .collection('posts')
-        .where('category',isEqualTo: 'Graphic Design')
-        .orderBy('likes',descending: true)
+        .where('category', isEqualTo: 'Graphic Design')
+        .orderBy('likes', descending: true)
         .limit(10)
         .getDocuments()
-        .then((fetchedUserPosts){
+        .then((fetchedUserPosts) {
       for (var post in fetchedUserPosts.documents)
         aggregateFetchedGraphicDesignPosts.add(post);
     });
     var Drawing = await _db
         .collection('posts')
-        .where('category',isEqualTo: 'Drawing')
-        .orderBy('likes',descending: true)
+        .where('category', isEqualTo: 'Drawing')
+        .orderBy('likes', descending: true)
         .limit(10)
         .getDocuments()
-        .then((fetchedUserPosts){
+        .then((fetchedUserPosts) {
       for (var post in fetchedUserPosts.documents)
         aggregateFetchedDrawingPosts.add(post);
     });
     var crafts = await _db
         .collection('posts')
-        .where('category',isEqualTo: 'Crafts')
-        .orderBy('likes',descending: true)
+        .where('category', isEqualTo: 'Crafts')
+        .orderBy('likes', descending: true)
         .limit(10)
         .getDocuments()
-        .then((fetchedUserPosts){
+        .then((fetchedUserPosts) {
       for (var post in fetchedUserPosts.documents)
         aggregateFetchedCraftsPosts.add(post);
     });
@@ -100,7 +116,6 @@ class _FeaturedState extends State<Featured> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -109,32 +124,26 @@ class _FeaturedState extends State<Featured> {
           key: _scaffoldKey,
           drawer: new AppDrawer(),
           appBar: AppBar(
-            title:
-            Text(
+            title: Text(
               "Discover",
-             style: AppTextStyles.appBarTitle,),
+              style: AppTextStyles.appBarTitle,
+            ),
             centerTitle: true,
-            leading:
-              IconButton(
-                icon: Icon(Icons.menu),
-                color: Colors.black,
-                onPressed: () {
-                  _scaffoldKey.currentState.openDrawer();
-                },
-              ),
+            leading: IconButton(
+              icon: Icon(Icons.menu),
+              color: Colors.black,
+              onPressed: () {
+                _scaffoldKey.currentState.openDrawer();
+              },
+            ),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.search),
                 color: Colors.black,
-                onPressed: (){
+                onPressed: () {
                   showSearch(context: context, delegate: DataSearch());
                 },
               ),
-              IconButton(
-                icon: Icon(Icons.sort),
-                color: Colors.black,
-                onPressed: (){},
-              )
             ],
             backgroundColor: Colors.white,
             elevation: 0,
@@ -182,177 +191,217 @@ class _FeaturedState extends State<Featured> {
           ),
           body: TabBarView(
             children: <Widget>[
-              SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(15.0) ,
-                      child: Text("Best of Last Week",
-                        textAlign: TextAlign.start,
-                        style: AppTextStyles.homeHeading,
+              RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _loadingDone = false;
+                  });
+                  fetchHomeAndChangeState();
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Text(
+                          "Best of All Time",
+                          textAlign: TextAlign.start,
+                          style: AppTextStyles.homeHeading,
+                        ),
                       ),
-                    ),
-                    postsFeatured.isEmpty
-                      ? Center (
-                        child: Text('No posts Yet. But stay tuned!!'),
-                    )
-                        : _loadingDone
-                        ? Column(
-                      children: postsFeatured.map((post) {
-                        return Post(
-                          post: post,
-                          uid: userId,
-                        );
-                      }).toList(),
-                    )
-                        : Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  ],
+                      postsFeatured.isEmpty
+                          ? Center(
+                              child: Text('No posts Yet. But stay tuned!!'),
+                            )
+                          : _loadingDone
+                              ? Column(
+                                  children: postsFeatured.map((post) {
+                                    return Post(
+                                      post: post,
+                                      uid: userId,
+                                    );
+                                  }).toList(),
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                    ],
+                  ),
                 ),
               ),
               Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(15.0) ,
-                          child: Text("Photography",
-                            textAlign: TextAlign.start,
-                            style: AppTextStyles.homeHeading,
-                          ),
+                  child: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _loadingDone = false;
+                  });
+                  fetchHomeAndChangeState();
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Text(
+                          "Photography",
+                          textAlign: TextAlign.start,
+                          style: AppTextStyles.homeHeading,
                         ),
-                        postsPhotography.isEmpty
-                            ? Center (
-                          child: Text('No posts Yet. But stay tuned!!'),
-                        )
-                            : _loadingDone
-                            ? Column(
-                          children: postsPhotography.map((post) {
-                            return Post(
-                              post: post,
-                              uid: userId,
-                            );
-                          }).toList(),
-                        )
-                            : Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-              ),
+                      ),
+                      postsPhotography.isEmpty
+                          ? Center(
+                              child: Text('No posts Yet. But stay tuned!!'),
+                            )
+                          : _loadingDone
+                              ? Column(
+                                  children: postsPhotography.map((post) {
+                                    return Post(
+                                      post: post,
+                                      uid: userId,
+                                    );
+                                  }).toList(),
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                    ],
+                  ),
+                ),
+              )),
               Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(15.0) ,
-                          child: Text("Graphic Design",
-                            textAlign: TextAlign.start,
-                            style: AppTextStyles.homeHeading,
-                          ),
+                  child: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _loadingDone = false;
+                  });
+                  fetchHomeAndChangeState();
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Text(
+                          "Graphic Design",
+                          textAlign: TextAlign.start,
+                          style: AppTextStyles.homeHeading,
                         ),
-                        postsGraphicDesign.isEmpty
-                            ? Center (
-                          child: Text('No posts Yet. But stay tuned!!'),
-                        )
-                            : _loadingDone
-                            ? Column(
-                          children: postsGraphicDesign.map((post) {
-                            return Post(
-                              post: post,
-                              uid: userId,
-                            );
-                          }).toList(),
-                        )
-                            : Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-              ),
+                      ),
+                      postsGraphicDesign.isEmpty
+                          ? Center(
+                              child: Text('No posts Yet. But stay tuned!!'),
+                            )
+                          : _loadingDone
+                              ? Column(
+                                  children: postsGraphicDesign.map((post) {
+                                    return Post(
+                                      post: post,
+                                      uid: userId,
+                                    );
+                                  }).toList(),
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                    ],
+                  ),
+                ),
+              )),
               Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(15.0) ,
-                          child: Text("Drawing",
-                            textAlign: TextAlign.start,
-                            style: AppTextStyles.homeHeading,
-                          ),
+                  child: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _loadingDone = false;
+                  });
+                  fetchHomeAndChangeState();
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Text(
+                          "Drawing",
+                          textAlign: TextAlign.start,
+                          style: AppTextStyles.homeHeading,
                         ),
-                        postsDrawing.isEmpty
-                            ? Center (
-                          child: Text('No posts Yet. But stay tuned!!'),
-                        )
-                            : _loadingDone
-                            ? Column(
-                          children: postsDrawing.map((post) {
-                            return Post(
-                              post: post,
-                              uid: userId,
-                            );
-                          }).toList(),
-                        )
-                            : Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-              ),
+                      ),
+                      postsDrawing.isEmpty
+                          ? Center(
+                              child: Text('No posts Yet. But stay tuned!!'),
+                            )
+                          : _loadingDone
+                              ? Column(
+                                  children: postsDrawing.map((post) {
+                                    return Post(
+                                      post: post,
+                                      uid: userId,
+                                    );
+                                  }).toList(),
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                    ],
+                  ),
+                ),
+              )),
               Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(15.0) ,
-                          child: Text("Crafts",
-                            textAlign: TextAlign.start,
-                            style: AppTextStyles.homeHeading,
-                          ),
+                  child: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _loadingDone = false;
+                  });
+                  fetchHomeAndChangeState();
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Text(
+                          "Crafts",
+                          textAlign: TextAlign.start,
+                          style: AppTextStyles.homeHeading,
                         ),
-                        postsCrafts.isEmpty
-                            ? Center (
-                          child: Text('No posts Yet. But stay tuned!!'),
-                        )
-                            : _loadingDone
-                            ? Column(
-                          children: postsCrafts.map((post) {
-                            return Post(
-                              post: post,
-                              uid: userId,
-                            );
-                          }).toList(),
-                        )
-                            : Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-              ),
+                      ),
+                      postsCrafts.isEmpty
+                          ? Center(
+                              child: Text('No posts Yet. But stay tuned!!'),
+                            )
+                          : _loadingDone
+                              ? Column(
+                                  children: postsCrafts.map((post) {
+                                    return Post(
+                                      post: post,
+                                      uid: userId,
+                                    );
+                                  }).toList(),
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                    ],
+                  ),
+                ),
+              )),
             ],
           ),
-        )
-    );
+        ));
   }
 }
