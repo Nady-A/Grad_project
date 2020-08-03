@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/utils/text_styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:grad_project/screens/profile/post_card.dart';
 
@@ -40,10 +41,22 @@ class _FavoritesState extends State<Favorites> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Favorites"),
+        backgroundColor: Colors.white,
+        title: Text(
+          "My Favorites",
+          style: AppTextStyles.appBarTitle,
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Colors.black,
+          onPressed: (){
+            Navigator.pop(context);
+            }
+          ,
+        ),
       ),
       body: isLoaded ? posts.length==0 ? Center(child: Text('You don\'t have any favorited posts.')) : ListView.builder(
-        itemBuilder: (conetxt, index) => Post(post: posts[index], uid: widget.uid,),
+        itemBuilder: (context, index) => Post(post: posts[index], uid: widget.uid,),
         itemCount: posts.length,
       ) : Center(child: CircularProgressIndicator()),
     );

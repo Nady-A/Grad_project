@@ -39,25 +39,6 @@ class _FeaturedState extends State<Featured> {
     var aggregateFetchedGraphicDesignPosts = [];
     var aggregateFetchedDrawingPosts = [];
     var aggregateFetchedCraftsPosts = [];
-//    var featured = await _db
-//        .collection('posts')
-//        .where('created_at', isGreaterThan: 1)
-//        .orderBy('created_at', descending: true)
-//        .where('likes', isGreaterThan: 3)
-//        .limit(10)
-//        .getDocuments()
-//        .then((fetchedUserPosts) {
-//      for (var post in fetchedUserPosts.documents)
-//        aggregateFetchedFeaturedPosts.add(post);
-//      print(aggregateFetchedFeaturedPosts);
-//    });
-//    var featured = await _db
-//    .collection('posts')
-//    .getDocuments()
-//    .then((fetchedUserPosts){
-//       = fetchedUserPosts.documents.where((element) => element.data['likes'] > 3 && element.data['created_at'] > 1).toList();
-//
-//    });
 
     aggregateFetchedFeaturedPosts = await _db
         .collection('posts')
@@ -236,7 +217,7 @@ class _FeaturedState extends State<Featured> {
           ),
           body: TabBarView(
             children: <Widget>[
-              buildTabView(postsFeatured, 'Best of All Time'),
+              buildTabView(postsFeatured, 'Best of Last Week'),
               buildTabView(postsPhotography, 'Photography'),
               buildTabView(postsGraphicDesign, 'Graphic Design'),
               buildTabView(postsDrawing, 'Drawing'),

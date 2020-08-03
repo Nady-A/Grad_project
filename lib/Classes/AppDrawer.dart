@@ -28,7 +28,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.favorite),
+            leading: Icon(Icons.star),
             title: Text("Favorites"),
             onTap: () async {
               FirebaseUser user = await FirebaseAuth.instance.currentUser();

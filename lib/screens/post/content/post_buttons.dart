@@ -39,8 +39,8 @@ class _PostButtonsState extends State<PostButtons> {
         children: <Widget>[
           IconButton(
             icon: Icon(
-              Icons.thumb_up,
-              color: isLiked ? Colors.blue : Colors.grey,
+              Icons.favorite,
+              color: isLiked ? Colors.red : Colors.grey,
             ),
             onPressed: () async {
               var msg;
@@ -95,8 +95,8 @@ class _PostButtonsState extends State<PostButtons> {
           ),
           IconButton(
             icon: Icon(
-              Icons.favorite,
-              color: isFav ? Colors.red : Colors.grey,
+              Icons.star,
+              color: isFav ? Colors.yellow : Colors.grey,
             ),
             onPressed: () async {
               var msg;
