@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grad_project/screens/events/selecting.dart';
 import 'package:grad_project/screens/events/submission.dart';
+import 'package:grad_project/screens/events/winner.dart';
 import 'package:grad_project/utils/text_styles.dart';
+import 'package:intl/intl.dart';
 
 
 class InsideEvent extends StatefulWidget {
@@ -15,12 +17,19 @@ class InsideEvent extends StatefulWidget {
 }
 
 class _InsideEventState extends State<InsideEvent> {
-  String text="Welcome";
+  String text=" ";
+  DateTime now =DateTime.now();
+
+  String getTime(String time) {
+    String time1,time2;
+    DateTime now = DateTime.parse(time);
+    time1 = DateFormat.yMMMMd().format(now);
+    time2 = DateFormat.jm().format(now);
+    return time1 + " " +time2 ;
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
 
     return Scaffold(
       appBar: AppBar(
@@ -50,8 +59,8 @@ class _InsideEventState extends State<InsideEvent> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text("from :${widget.start}",style: TextStyle(fontSize: 13)),
-                    Text("to: ${widget.end}",style: TextStyle(fontSize: 13)),
+                    Text("from :${getTime(widget.start)}",style: TextStyle(fontSize: 13)),
+                    Text("to: ${getTime(widget.end)}",style: TextStyle(fontSize: 13)),
                   ],
                 ),
                 Row(
@@ -84,7 +93,7 @@ class _InsideEventState extends State<InsideEvent> {
                     ),
                     SizedBox(width: 5,),
                     RaisedButton(
-                        onPressed:() => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) =>Submission(id:widget.id,ending:widget.endng),),),
+                        onPressed:() => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) =>Submission(id:widget.id,ending:widget.endng,finished: widget.end),),),
                         textColor: Colors.white,
                         padding: const EdgeInsets.all(0.0),
                         child:  Container(
@@ -110,23 +119,16 @@ class _InsideEventState extends State<InsideEvent> {
                     style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),
                   ),
                 ),
-               _bulidRow(context),
+               _bulidRow(context,widget.end),
               ],
             ),
           ),
     );
 
   }
-  Widget _bulidRow(BuildContext context)
+  Widget _bulidRow(BuildContext context, String x)
   {
-//    void _showSubmitPage (){
-//      showModalBottomSheet(context: context, builder: (context){
-//        return Container(
-//          padding: EdgeInsets.symmetric(horizontal: 8.0,vertical: 20.0),
-//          child: Text ("Butoon sheet"),
-//        );
-//      } );
-//    }
+    DateTime finish= DateTime.parse(x);
     if(widget.begin==true)
     {
       return Row(
@@ -154,6 +156,24 @@ class _InsideEventState extends State<InsideEvent> {
         ],
       );
     }
+
+    else if(now.isAfter(finish)){
+
+      return FlatButton.icon(
+          onPressed: (){
+            return showModalBottomSheet(
+              context: context,
+                builder: (BuildContext context){
+                  return  Winner(id:widget.id);
+                },
+             // backgroundColor: Colors.grey
+
+            );
+          },
+          icon:Icon(Icons.whatshot,color: Colors.red,size: 36,) ,
+          label: Text("View the Winner",style: TextStyle(fontSize: 16),));
+    }
+
     else
       return Center(
         child: Text(

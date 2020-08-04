@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grad_project/screens/events/inside_event.dart';
 import 'package:grad_project/screens/events/submission.dart';
+import 'package:intl/intl.dart';
 class CardView extends StatelessWidget {
   String url,title,start,end,description,rules,id;
   bool begin , endng;
@@ -24,10 +25,9 @@ class CardView extends StatelessWidget {
             Center(child: Text(title,style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),)),
             SizedBox(height: 3,),
 
-                Text("from :"+start,style: TextStyle(fontSize: 13),),
-                Text("to :"+end,style: TextStyle(fontSize: 13),),
-//            Text("${begin}"),
-//            Text("${endng}"),
+                Text("from : ${getTime(start)}",style: TextStyle(fontSize: 13),),
+                Text("to : ${getTime(end)}",style: TextStyle(fontSize: 13),),
+
 
             SizedBox(height: 5,),
           ],
@@ -36,4 +36,12 @@ class CardView extends StatelessWidget {
       elevation: 5,
     );;
   }
+  String getTime(String time) {
+    String time1,time2;
+    DateTime now = DateTime.parse(time);
+    time1 = DateFormat.yMMMMd().format(now);
+    time2 = DateFormat.jm().format(now);
+    return time1 + " " +time2 ;
+  }
+
 }

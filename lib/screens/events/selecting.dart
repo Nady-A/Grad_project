@@ -13,8 +13,8 @@ class Selecting extends StatefulWidget {
 }
 
 class _SelectingState extends State<Selecting> {
-
   Firestore _db = Firestore.instance;
+  CollectionReference favRef;
   bool _eventIsLoaded = false;
   var dat = [];
   String myId;
@@ -78,12 +78,23 @@ class _SelectingState extends State<Selecting> {
                   child: InkWell(
                     onTap: ()async{
                       var idd=dat[index]["post_id"];
-                      await _db.collection('events').document(widget.id).collection("submissions").document(idd).setData({'post_id' : idd,'rating' : 0});
-                      Scaffold.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Item Added successfully'),
-                        ),
-                      );
+                      favRef =  _db.collection('events').document(widget.id).collection("submissions");
+                      await favRef.document(idd).get().then((result) {
+                        if(result.exists){
+                          Scaffold.of(context).showSnackBar( SnackBar(
+                            content: Text('Item is selected before'),
+                          ),);
+                        }
+                        else
+                        {  _db.collection('events').document(widget.id).collection("submissions").document(idd).setData({'post_id' : idd,'rating' : 0});
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Item Added successfully'),
+                          ),
+                        );}
+                      });
+
+
                     },
                     child: Column(
                       children: <Widget>[

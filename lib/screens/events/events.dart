@@ -96,8 +96,8 @@ class _EventssState extends State<Eventss> {
           return CardView(
               url: dat[i]['url'],
               title: dat[i]['title'],
-              start: getTime(dat[i]['start']),
-              end: getTime(dat[i]['end']),
+              start: dat[i]['start'],
+              end: dat[i]['end'],
               description: dat[i]['description'],
               rules: dat[i]['rules'],
               id: dat[i]['id'],
@@ -111,21 +111,17 @@ class _EventssState extends State<Eventss> {
     ):Center(child: CircularProgressIndicator(),);
   }
 
-  String getTime(String time) {
-      String time1,time2;
-      //create date/time object
-      DateTime now = DateTime.parse(time);
-      time1 = DateFormat.yMMMMd().format(now);
-      time2 = DateFormat.jm().format(now);
-      return time1 + " " +time2 ;
-  }
+//  String getTime(String time) {
+//      String time1,time2;
+//      DateTime now = DateTime.parse(time);
+//      time1 = DateFormat.yMMMMd().format(now);
+//      time2 = DateFormat.jm().format(now);
+//      return time1 + " " +time2 ;
+//  }
 
   bool begain(String time) {
-    //DateTime ffff =DateTime(2020,6,18,22,36,0);
-    var now = DateTime.parse(time);
-    var after7days = now.add(new Duration(days: 6));
-//    print("start : ${now}");
-//    print("after7days ${after7days}");
+       var now = DateTime.parse(time);
+    var after7days = now.add(new Duration(days: 7));
     if(day.isAfter(now)&& day.isBefore(after7days))
       return true;
     else
@@ -133,11 +129,8 @@ class _EventssState extends State<Eventss> {
 
   }
   bool ending(String time) {
-    //DateTime ffff =DateTime(2020,6,18,22,36,0);
     var now = DateTime.parse(time);
     var from2week = now.subtract(new Duration(days: 23));
-//    print("after7days ${from2week}");
-//    print("end : ${now}");
     if(day.isAfter(from2week)&& day.isBefore(now))
       return true;
     else
