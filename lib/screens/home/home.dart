@@ -109,9 +109,9 @@ class _HomeState extends State<Home> {
             });
             fetchHomeAndChangeState();
           },
-          child: SingleChildScrollView(
+          child: ListView(
               scrollDirection: Axis.vertical,
-              child: Column(
+              children: <Widget>[ Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
@@ -146,7 +146,7 @@ class _HomeState extends State<Home> {
 //                              ),
 //                            )
                 ],
-              )),
+              )]),
         ),
       ),
     );
