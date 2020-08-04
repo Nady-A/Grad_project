@@ -4,6 +4,7 @@ import 'package:grad_project/utils/text_styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/Classes/Search.dart';
+import 'package:grad_project/screens/NewSearch.dart';
 import 'package:grad_project/Classes/AppDrawer.dart';
 import 'package:grad_project/screens/profile/post_card.dart';
 
@@ -167,7 +168,9 @@ class _FeaturedState extends State<Featured> {
                 icon: Icon(Icons.search),
                 color: Colors.black,
                 onPressed: () {
-                  showSearch(context: context, delegate: DataSearch());
+//                  showSearch(context: context, delegate: DataSearch());
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => NewSearch()));
                 },
               ),
             ],

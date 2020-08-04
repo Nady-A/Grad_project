@@ -3,6 +3,7 @@ import 'package:grad_project/utils/text_styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:grad_project/Classes/Search.dart';
+import 'package:grad_project/screens/NewSearch.dart';
 import 'package:grad_project/Classes/AppDrawer.dart';
 import 'package:grad_project/screens/profile/post_card.dart';
 
@@ -14,13 +15,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  bool _loadingDone = false;
+  bool _loadingDone;
   var posts = [];
   var userId;
 
   @override
   void initState() {
     super.initState();
+    _loadingDone = false;
     fetchHomeAndChangeState();
   }
 
@@ -52,6 +54,21 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Widget buildHomePosts() {
+    return posts.isEmpty
+        ? Center(
+            child: Text('You have no new posts'),
+          )
+        : Column(
+            children: posts.map((post) {
+              return Post(
+                post: post,
+                uid: userId,
+              );
+            }).toList(),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +93,9 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.search),
             color: Colors.black,
             onPressed: () {
-              showSearch(context: context, delegate: DataSearch());
+//              showSearch(context: context, delegate: DataSearch());
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => NewSearch()));
             },
           ),
         ],
@@ -100,25 +119,32 @@ class _HomeState extends State<Home> {
                     textAlign: TextAlign.start,
                     style: AppTextStyles.homeHeading,
                   ),
-                  posts.isEmpty
+                  !_loadingDone
                       ? Center(
-                          child: Text('You have no new posts'),
-                        )
-                      : _loadingDone
-                          ? Column(
-                              children: posts.map((post) {
-                                return Post(
-                                  post: post,
-                                  uid: userId,
-                                );
-                              }).toList(),
-                            )
-                          : Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
+                          child: Padding(
+                          padding: EdgeInsets.all(15),
+                          child: CircularProgressIndicator(),
+                        ))
+                      : buildHomePosts(),
+//                  posts.isEmpty
+//                      ? Center(
+//                          child: Text('You have no new posts'),
+//                        )
+//                      : _loadingDone
+//                          ? Column(
+//                              children: posts.map((post) {
+//                                return Post(
+//                                  post: post,
+//                                  uid: userId,
+//                                );
+//                              }).toList(),
+//                            )
+//                          : Center(
+//                              child: Padding(
+//                                padding: const EdgeInsets.all(15.0),
+//                                child: CircularProgressIndicator(),
+//                              ),
+//                            )
                 ],
               )),
         ),
